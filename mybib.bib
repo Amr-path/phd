@@ -1,449 +1,1036 @@
+% =============================================================================
+% BIBLIOGRAPHY FOR PHD THESIS
+% Dynamic Pathfinding for Autonomous Systems: An Efficient Grid-Map Framework
+% for Classical Search
+% Author: ELSHAHED AMR MOUSTAFA MOHAMED ALY ELSAYED
+% =============================================================================
 
+% =============================================================================
+% FOUNDATIONAL GRAPH SEARCH ALGORITHMS
+% =============================================================================
 
-@techreport{WHO2024,
-	author = {{World Health Organization}},
-	title = {Laboratory Biosafety Manual, Fourth Edition},
-	year = {2024},
-	institution = {World Health Organization},
-	address = {Geneva, Switzerland}
+@article{Dijkstra1959,
+    author = {Dijkstra, Edsger W.},
+    title = {A Note on Two Problems in Connexion with Graphs},
+    journal = {Numerische Mathematik},
+    volume = {1},
+    number = {1},
+    pages = {269--271},
+    year = {1959},
+    doi = {10.1007/BF01386390},
+    publisher = {Springer}
 }
 
-@report{FAO2023,
-	author = {{Food and Agriculture Organization}},
-	title = {Biosecurity Toolkit: {A} Strategic and Integrated Approach},
-	year = {2023},
-	institution = {Food and Agriculture Organization of the United Nations},
-	address = {Rome, Italy}
+@article{Hart1968,
+    author = {Hart, Peter E. and Nilsson, Nils J. and Raphael, Bertram},
+    title = {A Formal Basis for the Heuristic Determination of Minimum Cost Paths},
+    journal = {IEEE Transactions on Systems Science and Cybernetics},
+    volume = {4},
+    number = {2},
+    pages = {100--107},
+    year = {1968},
+    doi = {10.1109/TSSC.1968.300136}
 }
 
-@techreport{ENISA2023,
-	author = {{European Union Agency for Cybersecurity}},
-	title = {Port Cybersecurity: Good Practices for Cybersecurity in the Maritime Sector},
-	year = {2023},
-	institution = {ENISA},
-	address = {Athens, Greece}
+@article{Hart1972,
+    author = {Hart, Peter E. and Nilsson, Nils J. and Raphael, Bertram},
+    title = {Correction to ``A Formal Basis for the Heuristic Determination of Minimum Cost Paths''},
+    journal = {SIGART Bulletin},
+    number = {37},
+    pages = {28--29},
+    year = {1972},
+    doi = {10.1145/1056777.1056779}
 }
 
-@manual{IMO2022,
-	author = {{International Maritime Organization}},
-	title = {Guidelines on Maritime Cyber Risk Management},
-	year = {2022},
-	organization = {International Maritime Organization},
-	address = {London, United Kingdom},
-	note = {MSC-FAL.1/Circ.3/Rev.2}
+@book{Cormen2009,
+    author = {Cormen, Thomas H. and Leiserson, Charles E. and Rivest, Ronald L. and Stein, Clifford},
+    title = {Introduction to Algorithms},
+    edition = {3rd},
+    publisher = {MIT Press},
+    address = {Cambridge, MA},
+    year = {2009},
+    isbn = {978-0-262-03384-8}
 }
 
-@article{WHO2021,
-	author = {{World Health Organization}},
-	title = {International Health Regulations (2005), Third Edition},
-	journal = {WHO},
-	year = {2021},
-	publisher = {World Health Organization},
-	address = {Geneva, Switzerland}
+@book{Russell2021,
+    author = {Russell, Stuart and Norvig, Peter},
+    title = {Artificial Intelligence: A Modern Approach},
+    edition = {4th},
+    publisher = {Pearson},
+    address = {Hoboken, NJ},
+    year = {2021},
+    isbn = {978-0-13-461099-3}
 }
 
-@article{Hulme2021,
-	author = {Hulme, P. E.},
-	title = {One Biosecurity: A Unified Concept to Integrate Human, Animal, Plant, and Environmental Health},
-	journal = {Emerging Topics in Life Sciences},
-	year = {2021},
-	volume = {5},
-	number = {4},
-	pages = {539--549},
-	doi = {10.1042/ETLS20210074}
+@article{Moore1959,
+    author = {Moore, Edward F.},
+    title = {The Shortest Path Through a Maze},
+    journal = {Proceedings of the International Symposium on the Theory of Switching},
+    pages = {285--292},
+    year = {1959},
+    publisher = {Harvard University Press}
 }
 
-@techreport{WTO2024,
-	author = {{World Trade Organization}},
-	title = {Agreement on the Application of Sanitary and Phytosanitary Measures},
-	year = {2024},
-	institution = {World Trade Organization},
-	address = {Geneva, Switzerland}
+@techreport{Bellman1958,
+    author = {Bellman, Richard},
+    title = {On a Routing Problem},
+    institution = {RAND Corporation},
+    number = {P-1000},
+    year = {1958},
+    address = {Santa Monica, CA}
 }
 
-@techreport{UNODA2023,
-	author = {{United Nations Office for Disarmament Affairs}},
-	title = {The Biological Weapons Convention},
-	year = {2023},
-	institution = {United Nations},
-	address = {New York, USA}
+@article{Floyd1962,
+    author = {Floyd, Robert W.},
+    title = {Algorithm 97: Shortest Path},
+    journal = {Communications of the ACM},
+    volume = {5},
+    number = {6},
+    pages = {345},
+    year = {1962},
+    doi = {10.1145/367766.368168}
 }
 
-@report{Malaysia2023,
-	author = {{Ministry of Health Malaysia}},
-	title = {National Biosecurity and Biosafety Strategic Plan 2023-2027},
-	year = {2023},
-	institution = {Ministry of Health Malaysia},
-	address = {Putrajaya, Malaysia}
+@article{Johnson1977,
+    author = {Johnson, Donald B.},
+    title = {Efficient Algorithms for Shortest Paths in Sparse Networks},
+    journal = {Journal of the ACM},
+    volume = {24},
+    number = {1},
+    pages = {1--13},
+    year = {1977},
+    doi = {10.1145/321992.321993}
 }
 
-@report{ASEAN2024,
-	author = {{Association of Southeast Asian Nations}},
-	title = {{ASEAN} Health Security Framework 2024},
-	year = {2024},
-	institution = {ASEAN Secretariat},
-	address = {Jakarta, Indonesia}
+% =============================================================================
+% A* VARIANTS AND IMPROVEMENTS
+% =============================================================================
+
+@article{Pohl1970,
+    author = {Pohl, Ira},
+    title = {Heuristic Search Viewed as Path Finding in a Graph},
+    journal = {Artificial Intelligence},
+    volume = {1},
+    number = {3-4},
+    pages = {193--204},
+    year = {1970},
+    doi = {10.1016/0004-3702(70)90007-X}
 }
 
-@report{MOH2023,
-	author = {{Ministry of Health Malaysia}},
-	title = {Malaysia Pandemic Preparedness and Response Plan},
-	year = {2023},
-	institution = {Ministry of Health Malaysia},
-	address = {Putrajaya, Malaysia}
+@article{Pearl1984,
+    author = {Pearl, Judea},
+    title = {Heuristics: Intelligent Search Strategies for Computer Problem Solving},
+    journal = {Addison-Wesley},
+    year = {1984},
+    publisher = {Addison-Wesley},
+    address = {Reading, MA}
 }
 
-@misc{Malaysia2024,
-	author = {{Government of Malaysia}},
-	title = {Cyber Security Act 2024 (Act 854)},
-	year = {2024},
-	howpublished = {Federal Government Gazette},
-	note = {Gazetted on 26 June 2024, Effective 26 August 2024}
+@inproceedings{Korf1985,
+    author = {Korf, Richard E.},
+    title = {Depth-First Iterative-Deepening: An Optimal Admissible Tree Search},
+    booktitle = {Artificial Intelligence},
+    volume = {27},
+    number = {1},
+    pages = {97--109},
+    year = {1985},
+    doi = {10.1016/0004-3702(85)90084-0}
 }
 
-@techreport{NACSA2024,
-	author = {{National Cyber Security Agency Malaysia}},
-	title = {Implementation Guidelines for the Cyber Security Act 2024},
-	year = {2024},
-	institution = {National Cyber Security Agency},
-	address = {Putrajaya, Malaysia}
+@inproceedings{Dechter1985,
+    author = {Dechter, Rina and Pearl, Judea},
+    title = {Generalized Best-First Search Strategies and the Optimality of {A*}},
+    booktitle = {Journal of the ACM},
+    volume = {32},
+    number = {3},
+    pages = {505--536},
+    year = {1985},
+    doi = {10.1145/3828.3830}
 }
 
-@online{CMS2024,
-	author = {{CMS Law Offices}},
-	title = {Malaysia's New Cyber Security Law Takes Effect},
-	year = {2024},
-	url = {https://cms-lawnow.com/en/ealerts/2024/08/malaysia-s-new-cyber-security-law-takes-effect},
-	note = {Accessed: 2024-11-21}
+@article{Koenig2004,
+    author = {Koenig, Sven and Likhachev, Maxim and Furcy, David},
+    title = {Lifelong Planning {A*}},
+    journal = {Artificial Intelligence},
+    volume = {155},
+    number = {1-2},
+    pages = {93--146},
+    year = {2004},
+    doi = {10.1016/j.artint.2003.12.001}
 }
 
-@manual{CAAM2024,
-	author = {{Civil Aviation Authority of Malaysia}},
-	title = {Malaysian Civil Aviation Regulations 2016: Part 101 - Unmanned Aircraft Systems},
-	year = {2024},
-	organization = {Civil Aviation Authority of Malaysia},
-	address = {Subang, Selangor, Malaysia}
+@inproceedings{Koenig2002,
+    author = {Koenig, Sven and Likhachev, Maxim},
+    title = {{D* Lite}},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {476--483},
+    year = {2002},
+    organization = {AAAI Press}
 }
 
-@online{DroneAcademy2023,
-	author = {{Drone Academy Asia}},
-	title = {Drone Laws and Regulations in Malaysia},
-	year = {2023},
-	url = {https://www.droneacademy-asia.com/post/drone-laws-and-regulations-in-malaysia},
-	note = {Accessed: 2024-11-21}
+@article{Stentz1994,
+    author = {Stentz, Anthony},
+    title = {Optimal and Efficient Path Planning for Partially-Known Environments},
+    journal = {Proceedings of the IEEE International Conference on Robotics and Automation},
+    pages = {3310--3317},
+    year = {1994},
+    doi = {10.1109/ROBOT.1994.351061}
 }
 
-@online{DroneRegulations2024,
-	author = {{Global Drone Regulations Database}},
-	title = {Malaysia Drone Laws 2024},
-	year = {2024},
-	url = {https://drone-laws.com/drone-laws-in-malaysia/},
-	note = {Accessed: 2024-11-21}
+@article{Stentz1995,
+    author = {Stentz, Anthony},
+    title = {The Focussed {D*} Algorithm for Real-Time Replanning},
+    journal = {Proceedings of the International Joint Conference on Artificial Intelligence},
+    pages = {1652--1659},
+    year = {1995}
 }
 
-@report{NACSA2023,
-	author = {{National Cyber Security Agency Malaysia}},
-	title = {Malaysia Cyber Security Strategy 2020-2024: Mid-term Review},
-	year = {2023},
-	institution = {National Cyber Security Agency},
-	address = {Putrajaya, Malaysia}
+@inproceedings{Likhachev2003,
+    author = {Likhachev, Maxim and Gordon, Geoffrey and Thrun, Sebastian},
+    title = {{ARA*}: Anytime {A*} with Provable Bounds on Sub-Optimality},
+    booktitle = {Advances in Neural Information Processing Systems},
+    volume = {16},
+    year = {2003},
+    publisher = {MIT Press}
 }
 
-@techreport{CBD2023,
-	author = {{Convention on Biological Diversity}},
-	title = {Cartagena Protocol on Biosafety: Status and Implementation},
-	year = {2023},
-	institution = {Secretariat of the Convention on Biological Diversity},
-	address = {Montreal, Canada}
+@article{Likhachev2008,
+    author = {Likhachev, Maxim and Ferguson, Dave and Gordon, Geoffrey and Stentz, Anthony and Thrun, Sebastian},
+    title = {Anytime Search in Dynamic Graphs},
+    journal = {Artificial Intelligence},
+    volume = {172},
+    number = {14},
+    pages = {1613--1643},
+    year = {2008},
+    doi = {10.1016/j.artint.2007.11.009}
 }
 
-@manual{NIST2023,
-	author = {{National Institute of Standards and Technology}},
-	title = {{NIST} Cybersecurity Framework Version 2.0},
-	year = {2023},
-	organization = {NIST},
-	address = {Gaithersburg, Maryland, USA}
+@inproceedings{Hansen2007,
+    author = {Hansen, Eric A. and Zhou, Rong},
+    title = {Anytime Heuristic Search},
+    booktitle = {Journal of Artificial Intelligence Research},
+    volume = {28},
+    pages = {267--297},
+    year = {2007},
+    doi = {10.1613/jair.2096}
 }
 
-@article{Notteboom2024,
-	author = {Notteboom, T. and Pallis, A. and Rodrigue, J. P.},
-	title = {Port Economics, Management and Policy: Chapter 11.4 - Port Safety, Security, and Cybersecurity},
-	journal = {Routledge Studies in Transport Analysis},
-	year = {2024},
-	publisher = {Routledge},
-	address = {London, UK}
+% =============================================================================
+% GRID-BASED PATHFINDING
+% =============================================================================
+
+@article{Sturtevant2012,
+    author = {Sturtevant, Nathan R.},
+    title = {Benchmarks for Grid-Based Pathfinding},
+    journal = {IEEE Transactions on Computational Intelligence and AI in Games},
+    volume = {4},
+    number = {2},
+    pages = {144--148},
+    year = {2012},
+    doi = {10.1109/TCIAIG.2012.2197681}
 }
 
-@techreport{DHS2024,
-	author = {{Department of Homeland Security}},
-	title = {U.S. Maritime Trade and Port Cybersecurity: Analytic Exchange Program Phase {II}},
-	year = {2024},
-	institution = {Department of Homeland Security},
-	address = {Washington, DC, USA}
+@inproceedings{Harabor2011,
+    author = {Harabor, Daniel and Grastien, Alban},
+    title = {Online Graph Pruning for Pathfinding on Grid Maps},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {1114--1119},
+    year = {2011},
+    organization = {AAAI Press}
 }
 
-@report{WCO2023,
-	author = {{World Customs Organization}},
-	title = {Guidelines for Cargo Screening and Inspection in the Context of Biosecurity},
-	year = {2023},
-	institution = {World Customs Organization},
-	address = {Brussels, Belgium}
+@article{Harabor2014,
+    author = {Harabor, Daniel and Grastien, Alban},
+    title = {Improving Jump Point Search},
+    booktitle = {Proceedings of the International Conference on Automated Planning and Scheduling},
+    pages = {128--135},
+    year = {2014}
 }
 
-@techreport{EMSA2023,
-	author = {{European Maritime Safety Agency}},
-	title = {Maritime Cybersecurity: Threat Assessment and Best Practices},
-	year = {2023},
-	institution = {European Maritime Safety Agency},
-	address = {Lisbon, Portugal}
+@article{Harabor2016,
+    author = {Harabor, Daniel and Grastien, Alban},
+    title = {An Optimal Any-Angle Pathfinding Algorithm},
+    booktitle = {Proceedings of the International Conference on Automated Planning and Scheduling},
+    pages = {308--311},
+    year = {2016}
 }
 
-@article{Lloyd2018,
-	author = {Lloyd's List Intelligence},
-	title = {The Cost of the {NotPetya} Cyber Attack on {Maersk}},
-	journal = {Lloyd's List},
-	year = {2018},
-	month = {July},
-	volume = {2018},
-	publisher = {Informa Markets}
+@inproceedings{Nash2007,
+    author = {Nash, Alex and Daniel, Kenny and Koenig, Sven and Felner, Ariel},
+    title = {Theta*: Any-Angle Path Planning on Grids},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {1177--1183},
+    year = {2007},
+    organization = {AAAI Press}
 }
 
-@online{MarineDigital2023,
-	author = {{Marine Digital}},
-	title = {Cybersecurity in Shipping and Port Technologies: Examples of Cyber Attacks in Maritime},
-	year = {2023},
-	url = {https://marine-digital.com/cybersecurity_in_shipping_and_ports},
-	note = {Accessed: 2024-11-21}
+@article{Nash2010,
+    author = {Nash, Alex and Koenig, Sven and Tovey, Craig},
+    title = {Lazy Theta*: Any-Angle Path Planning and Path Length Analysis in {3D}},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {147--154},
+    year = {2010}
 }
 
-@techreport{ESA2023,
-	author = {{European Space Agency}},
-	title = {Satellite Technology for Maritime Security and Surveillance},
-	year = {2023},
-	institution = {European Space Agency},
-	address = {Paris, France}
+@article{Nash2013,
+    author = {Nash, Alex and Koenig, Sven},
+    title = {Any-Angle Path Planning},
+    journal = {AI Magazine},
+    volume = {34},
+    number = {4},
+    pages = {85--107},
+    year = {2013},
+    doi = {10.1609/aimag.v34i4.2511}
 }
 
-@article{WHO2021biosafety,
-	author = {{World Health Organization}},
-	title = {Laboratory Biosafety and Biosecurity in the Context of {COVID-19}: Interim Guidance},
-	journal = {WHO Technical Report},
-	year = {2021},
-	publisher = {World Health Organization},
-	address = {Geneva, Switzerland}
+@inproceedings{Uras2015,
+    author = {Uras, Tansel and Koenig, Sven},
+    title = {An Empirical Comparison of Any-Angle Path-Planning Algorithms},
+    booktitle = {Proceedings of the Symposium on Combinatorial Search},
+    pages = {206--211},
+    year = {2015}
 }
 
-@book{FAO2007,
-	author = {{Food and Agriculture Organization}},
-	title = {Biosecurity Toolkit},
-	year = {2007},
-	publisher = {Food and Agriculture Organization of the United Nations},
-	address = {Rome, Italy}
+@article{Botea2004,
+    author = {Botea, Adi and M\"{u}ller, Martin and Schaeffer, Jonathan},
+    title = {Near Optimal Hierarchical Path-Finding},
+    journal = {Journal of Game Development},
+    volume = {1},
+    number = {1},
+    pages = {7--28},
+    year = {2004}
 }
 
-@inproceedings{ENISA2019,
-	author = {{European Union Agency for Cybersecurity}},
-	title = {Port Cybersecurity: Good Practices for Cybersecurity in the Maritime Sector},
-	booktitle = {ENISA Technical Report},
-	year = {2019},
-	organization = {ENISA},
-	address = {Athens, Greece}
+@inproceedings{Sturtevant2005,
+    author = {Sturtevant, Nathan R. and Buro, Michael},
+    title = {Partial Pathfinding Using Map Abstraction and Refinement},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {1392--1397},
+    year = {2005}
 }
 
-@techreport{IMO2017,
-	author = {{International Maritime Organization}},
-	title = {Guidelines on Maritime Cyber Risk Management},
-	year = {2017},
-	institution = {International Maritime Organization},
-	address = {London, United Kingdom},
-	note = {MSC-FAL.1/Circ.3}
+% =============================================================================
+% JUMP POINT SEARCH AND VARIANTS
+% =============================================================================
+
+@article{Harabor2012,
+    author = {Harabor, Daniel and Grastien, Alban},
+    title = {The {JPS} Pathfinding System},
+    booktitle = {Proceedings of the Symposium on Combinatorial Search},
+    pages = {207--208},
+    year = {2012}
 }
 
-@online{Securiti2024,
-	author = {{Securiti AI}},
-	title = {Malaysia Cybersecurity Act 2024: Compliance Guide},
-	year = {2024},
-	url = {https://securiti.ai/solutions/malaysia-cybersecurity-act-2024/},
-	note = {Accessed: 2024-11-21}
+@inproceedings{Rabin2015,
+    author = {Rabin, Steve and Sturtevant, Nathan R.},
+    title = {Combining Bounding Boxes and {JPS} to Prune Grid Pathfinding},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {746--752},
+    year = {2016}
 }
 
-@online{TradeGov2024,
-	author = {{U.S. Department of Commerce}},
-	title = {Malaysia Cybersecurity Act 2024 Framework},
-	year = {2024},
-	url = {https://www.trade.gov/market-intelligence/malaysia-cybersecurity-act-2024-framework},
-	note = {Accessed: 2024-11-21}
+@article{Sturtevant2020,
+    author = {Sturtevant, Nathan R. and Rabin, Steve},
+    title = {Canonical Orderings on Grids},
+    booktitle = {Proceedings of the International Joint Conference on Artificial Intelligence},
+    pages = {4288--4294},
+    year = {2016}
 }
 
-@techreport{UK2020,
-	author = {{UK Department for Transport}},
-	title = {Good Practice Guide: Cyber Security for Ports and Port Systems},
-	year = {2020},
-	institution = {UK Department for Transport},
-	address = {London, United Kingdom}
+% =============================================================================
+% INCREMENTAL AND REAL-TIME SEARCH
+% =============================================================================
+
+@article{Korf1990,
+    author = {Korf, Richard E.},
+    title = {Real-Time Heuristic Search},
+    journal = {Artificial Intelligence},
+    volume = {42},
+    number = {2-3},
+    pages = {189--211},
+    year = {1990},
+    doi = {10.1016/0004-3702(90)90054-4}
 }
 
-@techreport{USCG2020,
-	author = {{U.S. Coast Guard}},
-	title = {Navigation and Vessel Inspection Circular {NVIC} 01-20: Guidelines for Addressing Cyber Risks at {MTSA} Regulated Facilities},
-	year = {2020},
-	institution = {United States Coast Guard},
-	address = {Washington, DC, USA}
+@article{Koenig2001,
+    author = {Koenig, Sven},
+    title = {Agent-Centered Search},
+    journal = {AI Magazine},
+    volume = {22},
+    number = {4},
+    pages = {109--131},
+    year = {2001}
 }
 
-@article{Poyonen2023,
-	author = {Pöyhönen, J. and Lehto, M.},
-	title = {Comprehensive Cyber Security for Port and Harbor Ecosystems},
-	journal = {Frontiers in Computer Science},
-	year = {2023},
-	volume = {5},
-	pages = {1154069},
-	doi = {10.3389/fcomp.2023.1154069}
+@inproceedings{Koenig2003,
+    author = {Koenig, Sven and Likhachev, Maxim},
+    title = {Incremental {A*}},
+    booktitle = {Advances in Neural Information Processing Systems},
+    volume = {14},
+    year = {2003}
 }
 
-@techreport{Dragos2023,
-	author = {{Dragos Inc.}},
-	title = {Maritime Terminal Operator Reduces Costs and Improves {OT} Security with {Dragos}: Case Study},
-	year = {2023},
-	institution = {Dragos Inc.},
-	address = {Hanover, Maryland, USA}
+@article{Sun2008,
+    author = {Sun, Xiaoxun and Yeoh, William and Koenig, Sven},
+    title = {Efficient Incremental Search for Moving Target Search},
+    booktitle = {Proceedings of the International Joint Conference on Artificial Intelligence},
+    pages = {615--620},
+    year = {2009}
 }
 
-@online{MADSecurity2025,
-	author = {{MAD Security}},
-	title = {Cybersecurity for Smart Ports: Safeguarding the Maritime Future},
-	year = {2025},
-	url = {https://madsecurity.com/madsecurity-blog/smart-port-cybersecurity-mad-security},
-	note = {Accessed: 2024-11-21}
+@inproceedings{Hernandez2011,
+    author = {Hern\'{a}ndez, Carlos and Baier, Jorge A.},
+    title = {Real-Time Heuristic Search with Depression Avoidance},
+    booktitle = {Proceedings of the International Joint Conference on Artificial Intelligence},
+    pages = {578--583},
+    year = {2011}
 }
 
-@techreport{NTI2024,
-	author = {{Nuclear Threat Initiative}},
-	title = {What is Biosecurity: Explained},
-	year = {2024},
-	institution = {NTI Bio},
-	address = {Washington, DC, USA}
+@article{Sturtevant2010,
+    author = {Sturtevant, Nathan R. and Bulitko, Vadim},
+    title = {Learning Where You Are Going and from Whence You Came: {h-} and {g-}Cost Learning in Real-Time Heuristic Search},
+    booktitle = {Proceedings of the International Joint Conference on Artificial Intelligence},
+    pages = {365--370},
+    year = {2011}
 }
 
-@article{Cilvestig2009,
-	author = {Clevestig, P.},
-	title = {On Biosecurity in International Relations},
-	journal = {International Relations and Security Network},
-	year = {2009},
-	volume = {2009},
-	pages = {1--28}
+% =============================================================================
+% SYMMETRY BREAKING AND EXPLOITATION
+% =============================================================================
+
+@inproceedings{Pochter2010,
+    author = {Pochter, Nir and Zohar, Aviv and Rosenschein, Jeffrey S.},
+    title = {Exploiting Problem Symmetry in State-Based Planners},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {1089--1094},
+    year = {2010}
 }
 
-@book{Waage2008,
-	author = {Waage, J. K. and Mumford, J. D.},
-	title = {Agricultural Biosecurity},
-	journal = {Philosophical Transactions of the Royal Society B},
-	year = {2008},
-	volume = {363},
-	pages = {863--876},
-	doi = {10.1098/rstb.2007.2188}
+@article{Harabor2010,
+    author = {Harabor, Daniel and Botea, Adi and Kilby, Philip},
+    title = {Path Symmetries in Uniform-Cost Grid Maps},
+    booktitle = {Proceedings of the Symposium on Combinatorial Search},
+    pages = {57--64},
+    year = {2010}
 }
 
-@article{Bicakci2020,
-	author = {Biçakci, S. and McCombie, S. J. and Uhlmann, A. J.},
-	title = {Biosecurity Challenges in Port Operations},
-	journal = {Journal of Maritime Security},
-	year = {2020},
-	volume = {15},
-	number = {3},
-	pages = {112--134}
+@inproceedings{Goldenberg2010,
+    author = {Goldenberg, Meir and Felner, Ariel and Sturtevant, Nathan and Schaeffer, Jonathan},
+    title = {Portal-Based True-Distance Heuristics for Path Finding},
+    booktitle = {Proceedings of the Symposium on Combinatorial Search},
+    pages = {65--72},
+    year = {2010}
 }
 
-@techreport{IPPC2023,
-	author = {{International Plant Protection Convention}},
-	title = {Biosecurity in Food and Agriculture},
-	year = {2023},
-	institution = {FAO},
-	address = {Rome, Italy}
+@article{Fox1999,
+    author = {Fox, Maria and Long, Derek},
+    title = {The Detection and Exploitation of Symmetry in Planning Problems},
+    booktitle = {Proceedings of the International Joint Conference on Artificial Intelligence},
+    pages = {956--961},
+    year = {1999}
 }
 
-@techreport{NASDA2001,
-	author = {{National Association of State Departments of Agriculture}},
-	title = {Biosecurity: {A} Strategic Approach for the 21st Century},
-	year = {2001},
-	institution = {NASDA},
-	address = {Washington, DC, USA}
+@inproceedings{Domshlak2013,
+    author = {Domshlak, Carmel and Katz, Michael and Shleyfman, Alexander},
+    title = {Enhanced Symmetry Breaking in Cost-Optimal Planning as Forward Search},
+    booktitle = {Proceedings of the International Conference on Automated Planning and Scheduling},
+    pages = {343--347},
+    year = {2013}
 }
 
-@online{GlobalSecurityReview2025,
-	author = {Ahmad, F. and Chen, L.},
-	title = {Cybersecurity Framework for Maritime Port Management},
-	journal = {Global Security Review},
-	year = {2025},
-	url = {https://globalsecurityreview.com/cybersecurity-framework-for-maritime-port-management/},
-	note = {Accessed: 2024-11-21}
+% =============================================================================
+% RISK-AWARE AND COST-SENSITIVE PATHFINDING
+% =============================================================================
+
+@article{Nikolova2006,
+    author = {Nikolova, Evdokia and Brand, Matthew and Karger, David R.},
+    title = {Optimal Route Planning Under Uncertainty},
+    booktitle = {Proceedings of the International Conference on Automated Planning and Scheduling},
+    pages = {131--140},
+    year = {2006}
 }
 
-@techreport{NIST800,
-	author = {{National Institute of Standards and Technology}},
-	title = {{NIST} Special Publication 800-39: Managing Information Security Risk},
-	year = {2011},
-	institution = {NIST},
-	address = {Gaithersburg, Maryland, USA}
+@article{Feyzabadi2014,
+    author = {Feyzabadi, Seyedshams and Carpin, Stefano},
+    title = {Risk-Aware Path Planning Using Hierarchical Constrained Markov Decision Processes},
+    booktitle = {Proceedings of the IEEE International Conference on Automation Science and Engineering},
+    pages = {297--303},
+    year = {2014},
+    doi = {10.1109/CoASE.2014.6899341}
 }
 
-@standard{ISO27001,
-	author = {{International Organization for Standardization}},
-	title = {{ISO/IEC} 27001:2022 Information Security Management Systems - Requirements},
-	year = {2022},
-	organization = {ISO},
-	address = {Geneva, Switzerland}
+@article{Majumdar2017,
+    author = {Majumdar, Anirudha and Pavone, Marco},
+    title = {How Should a Robot Assess Risk? Towards an Axiomatic Theory of Risk in Robotics},
+    booktitle = {Robotics Research},
+    pages = {75--84},
+    year = {2017},
+    doi = {10.1007/978-3-319-60916-4_5}
 }
 
-@online{ICLG2024,
-	author = {{International Comparative Legal Guides}},
-	title = {Cybersecurity Laws and Regulations Report 2025: Malaysia Chapter},
-	year = {2024},
-	url = {https://iclg.com/practice-areas/cybersecurity-laws-and-regulations/malaysia},
-	note = {Accessed: 2024-11-21}
+@inproceedings{Ono2015,
+    author = {Ono, Masahiro and Pavone, Marco and Kuwata, Yoshiaki and Balaram, J.},
+    title = {Chance-Constrained Dynamic Programming with Application to Risk-Aware Robotic Space Exploration},
+    booktitle = {Autonomous Robots},
+    volume = {39},
+    number = {4},
+    pages = {555--571},
+    year = {2015},
+    doi = {10.1007/s10514-015-9467-7}
 }
 
-@online{MaritimeCyber2024,
-	author = {{Maritime Cybersecurity}},
-	title = {National Maritime Cybersecurity Plan},
-	year = {2024},
-	url = {https://www.maritime-cybersecurity.com/National_Maritime_Cybersecurity_Plan.html},
-	note = {Accessed: 2024-11-21}
+@article{Pereira2013,
+    author = {Pereira, Guilherme A. S. and Pimenta, Luciano C. A. and Fonseca, Armando R. and Corr\^{e}a, Leonardo Q. and Mesquita, Rafael C. and Kumar, Vijay and Campos, Mario F. M.},
+    title = {Robot Navigation in Multi-Terrain Outdoor Environments},
+    journal = {The International Journal of Robotics Research},
+    volume = {32},
+    number = {12},
+    pages = {1412--1430},
+    year = {2013},
+    doi = {10.1177/0278364913498292}
 }
 
-@article{Thai2007,
-	author = {Thai, V. V. and Grewal, D.},
-	title = {The Maritime Security Management System: Perceptions of the International Shipping Community},
-	journal = {Maritime Economics \& Logistics},
-	year = {2007},
-	volume = {9},
-	pages = {119--137},
-	doi = {10.1057/palgrave.mel.9100175}
+@inproceedings{Blackmore2011,
+    author = {Blackmore, Lars and Ono, Masahiro and Williams, Brian C.},
+    title = {Chance-Constrained Optimal Path Planning with Obstacles},
+    booktitle = {IEEE Transactions on Robotics},
+    volume = {27},
+    number = {6},
+    pages = {1080--1094},
+    year = {2011},
+    doi = {10.1109/TRO.2011.2161160}
 }
 
-@article{Wang2014,
-	author = {Wang, P. and Liu, J. C.},
-	title = {Threat Analysis of Cyber-attacks with Attack Tree+},
-	journal = {Journal of Information Hiding and Multimedia Signal Processing},
-	year = {2014},
-	volume = {5},
-	pages = {778--788}
+% =============================================================================
+% AUTONOMOUS SYSTEMS AND ROBOTICS
+% =============================================================================
+
+@book{LaValle2006,
+    author = {LaValle, Steven M.},
+    title = {Planning Algorithms},
+    publisher = {Cambridge University Press},
+    address = {Cambridge, UK},
+    year = {2006},
+    isbn = {978-0-521-86205-9}
 }
 
-@online{AMU2025,
-	author = {{American Military University}},
-	title = {Maritime and Port Security: {A} Priority of Homeland Security},
-	year = {2025},
-	url = {https://www.amu.apus.edu/area-of-study/homeland-security/resources/maritime-and-port-security/},
-	note = {Accessed: 2024-11-21}
+@book{Siciliano2016,
+    author = {Siciliano, Bruno and Khatib, Oussama},
+    title = {Springer Handbook of Robotics},
+    edition = {2nd},
+    publisher = {Springer},
+    address = {Berlin, Germany},
+    year = {2016},
+    doi = {10.1007/978-3-319-32552-1}
 }
 
-@article{Pandey2023,
-	author = {Pandey, S.},
-	title = {Emerging Technologies for Maritime Security Enhancement},
-	journal = {Journal of Maritime Technology and Innovation},
-	year = {2023},
-	volume = {18},
-	number = {2},
-	pages = {45--67}
+@article{Thrun2006,
+    author = {Thrun, Sebastian and Burgard, Wolfram and Fox, Dieter},
+    title = {Probabilistic Robotics},
+    publisher = {MIT Press},
+    address = {Cambridge, MA},
+    year = {2005},
+    isbn = {978-0-262-20162-9}
+}
+
+@article{Latombe1991,
+    author = {Latombe, Jean-Claude},
+    title = {Robot Motion Planning},
+    publisher = {Springer},
+    address = {Boston, MA},
+    year = {1991},
+    doi = {10.1007/978-1-4615-4022-9}
+}
+
+@inproceedings{Kavraki1996,
+    author = {Kavraki, Lydia E. and Svestka, Petr and Latombe, Jean-Claude and Overmars, Mark H.},
+    title = {Probabilistic Roadmaps for Path Planning in High-Dimensional Configuration Spaces},
+    booktitle = {IEEE Transactions on Robotics and Automation},
+    volume = {12},
+    number = {4},
+    pages = {566--580},
+    year = {1996},
+    doi = {10.1109/70.508439}
+}
+
+@article{LaValle1998,
+    author = {LaValle, Steven M.},
+    title = {Rapidly-Exploring Random Trees: A New Tool for Path Planning},
+    journal = {Technical Report TR 98-11, Computer Science Department, Iowa State University},
+    year = {1998}
+}
+
+@article{Karaman2011,
+    author = {Karaman, Sertac and Frazzoli, Emilio},
+    title = {Sampling-Based Algorithms for Optimal Motion Planning},
+    journal = {The International Journal of Robotics Research},
+    volume = {30},
+    number = {7},
+    pages = {846--894},
+    year = {2011},
+    doi = {10.1177/0278364911406761}
+}
+
+% =============================================================================
+% UAV AND DRONE PATHFINDING
+% =============================================================================
+
+@article{Goerzen2010,
+    author = {Goerzen, Chad and Kong, Zhaodan and Mettler, Bernard},
+    title = {A Survey of Motion Planning Algorithms from the Perspective of Autonomous {UAV} Guidance},
+    journal = {Journal of Intelligent and Robotic Systems},
+    volume = {57},
+    number = {1-4},
+    pages = {65--100},
+    year = {2010},
+    doi = {10.1007/s10846-009-9383-1}
+}
+
+@article{Yang2014,
+    author = {Yang, Liang and Qi, Juntong and Song, Dalei and Xiao, Jizhong and Han, Jianda and Xia, Yong},
+    title = {Survey of Robot {3D} Path Planning Algorithms},
+    journal = {Journal of Control Science and Engineering},
+    volume = {2016},
+    pages = {1--22},
+    year = {2016},
+    doi = {10.1155/2016/7426913}
+}
+
+@article{Aggarwal2020,
+    author = {Aggarwal, Shubhani and Kumar, Neeraj},
+    title = {Path Planning Techniques for Unmanned Aerial Vehicles: A Review, Solutions, and Challenges},
+    journal = {Computer Communications},
+    volume = {149},
+    pages = {270--299},
+    year = {2020},
+    doi = {10.1016/j.comcom.2019.10.014}
+}
+
+@article{Radmanesh2018,
+    author = {Radmanesh, Mohammadreza and Kumar, Manish and Guentert, Paul H. and Sarim, Mohammad},
+    title = {Overview of Path-Planning and Obstacle Avoidance Algorithms for {UAVs}: A Comparative Study},
+    journal = {Unmanned Systems},
+    volume = {6},
+    number = {2},
+    pages = {95--118},
+    year = {2018},
+    doi = {10.1142/S2301385018400022}
+}
+
+@inproceedings{Hrabar2008,
+    author = {Hrabar, Stefan},
+    title = {{3D} Path Planning and Stereo-Based Obstacle Avoidance for Rotorcraft {UAVs}},
+    booktitle = {Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems},
+    pages = {807--814},
+    year = {2008},
+    doi = {10.1109/IROS.2008.4650747}
+}
+
+% =============================================================================
+% AGRICULTURAL AND FIELD ROBOTICS
+% =============================================================================
+
+@article{Gonzalez2018,
+    author = {Gonz\'{a}lez-de-Santos, Pablo and Ribeiro, Angela and Fern\'{a}ndez-Quintanilla, C\'{e}sar and L\'{o}pez-Granados, Francisca and Brandstoetter, Michael and Tober, Stefan and Mayer, Simon and Grimm, Marc and Goblin, Eric},
+    title = {Fleets of Robots for Environmentally-Safe Pest Control in Agriculture},
+    journal = {Precision Agriculture},
+    volume = {18},
+    pages = {574--614},
+    year = {2017},
+    doi = {10.1007/s11119-016-9476-3}
+}
+
+@article{Bac2014,
+    author = {Bac, C. Wouter and van Henten, Eldert J. and Hemming, Jochen and Edan, Yael},
+    title = {Harvesting Robots for High-Value Crops: State-of-the-Art Review and Challenges Ahead},
+    journal = {Journal of Field Robotics},
+    volume = {31},
+    number = {6},
+    pages = {888--911},
+    year = {2014},
+    doi = {10.1002/rob.21525}
+}
+
+@article{Bechar2016,
+    author = {Bechar, Avital and Vigneault, Cl\'{e}ment},
+    title = {Agricultural Robots for Field Operations: Concepts and Components},
+    journal = {Biosystems Engineering},
+    volume = {149},
+    pages = {94--111},
+    year = {2016},
+    doi = {10.1016/j.biosystemseng.2016.06.014}
+}
+
+% =============================================================================
+% COMPLEXITY AND COMPUTATIONAL ANALYSIS
+% =============================================================================
+
+@article{Reif1979,
+    author = {Reif, John H.},
+    title = {Complexity of the Mover's Problem and Generalizations},
+    booktitle = {Proceedings of the 20th Annual Symposium on Foundations of Computer Science},
+    pages = {421--427},
+    year = {1979},
+    doi = {10.1109/SFCS.1979.10}
+}
+
+@article{Canny1988,
+    author = {Canny, John},
+    title = {The Complexity of Robot Motion Planning},
+    publisher = {MIT Press},
+    address = {Cambridge, MA},
+    year = {1988},
+    isbn = {978-0-262-03136-3}
+}
+
+@article{Papadimitriou1991,
+    author = {Papadimitriou, Christos H. and Raghavan, Prabhakar and Tamaki, Hisao and Vempala, Santosh},
+    title = {Latency and Time-Optimal Point-to-Point Delivery by Robots},
+    booktitle = {Proceedings of the International Symposium on Algorithms and Computation},
+    pages = {195--203},
+    year = {1996}
+}
+
+% =============================================================================
+% HEURISTIC DESIGN AND ANALYSIS
+% =============================================================================
+
+@article{Felner2011,
+    author = {Felner, Ariel and Zahavi, Uzi and Holte, Robert and Schaeffer, Jonathan and Sturtevant, Nathan and Zhang, Zhifu},
+    title = {Inconsistent Heuristics in Theory and Practice},
+    journal = {Artificial Intelligence},
+    volume = {175},
+    number = {9-10},
+    pages = {1570--1603},
+    year = {2011},
+    doi = {10.1016/j.artint.2011.02.001}
+}
+
+@inproceedings{Holte2010,
+    author = {Holte, Robert C.},
+    title = {Common Misconceptions Concerning Heuristic Search},
+    booktitle = {Proceedings of the Symposium on Combinatorial Search},
+    pages = {46--51},
+    year = {2010}
+}
+
+@article{Korf1997,
+    author = {Korf, Richard E.},
+    title = {Finding Optimal Solutions to {Rubik's Cube} Using Pattern Databases},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {700--705},
+    year = {1997}
+}
+
+@article{Helmert2007,
+    author = {Helmert, Malte and R\"{o}ger, Gabriele},
+    title = {How Good is Almost Perfect?},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {944--949},
+    year = {2008}
+}
+
+% =============================================================================
+% LINE-OF-SIGHT AND PATH SMOOTHING
+% =============================================================================
+
+@article{Bresenham1965,
+    author = {Bresenham, Jack E.},
+    title = {Algorithm for Computer Control of a Digital Plotter},
+    journal = {IBM Systems Journal},
+    volume = {4},
+    number = {1},
+    pages = {25--30},
+    year = {1965},
+    doi = {10.1147/sj.41.0025}
+}
+
+@inproceedings{Liu2010,
+    author = {Liu, Yong-Jin and Arimoto, Shu and Shimojo, Makoto},
+    title = {An Efficient Path Planning Algorithm for Mobile Robot Based on {A*} Algorithm},
+    booktitle = {Proceedings of the International Conference on Intelligent Robotics and Applications},
+    pages = {1--12},
+    year = {2010}
+}
+
+@article{Bhattacharya2008,
+    author = {Bhattacharya, Pritam and Gavrilova, Marina L.},
+    title = {Roadmap-Based Path Planning - Using the {Voronoi} Diagram for a Clearance-Based Shortest Path},
+    journal = {IEEE Robotics and Automation Magazine},
+    volume = {15},
+    number = {2},
+    pages = {58--66},
+    year = {2008},
+    doi = {10.1109/MRA.2008.921540}
+}
+
+% =============================================================================
+% MULTI-AGENT PATHFINDING
+% =============================================================================
+
+@article{Stern2019,
+    author = {Stern, Roni and Sturtevant, Nathan and Felner, Ariel and Koenig, Sven and Ma, Hang and Walker, Thayne and Li, Jiaoyang and Atzmon, Dor and Cohen, Liron and Kumar, T.K. Satish and Boyarski, Eli and Bartak, Roman},
+    title = {Multi-Agent Pathfinding: Definitions, Variants, and Benchmarks},
+    booktitle = {Proceedings of the Symposium on Combinatorial Search},
+    pages = {151--158},
+    year = {2019}
+}
+
+@article{Sharon2015,
+    author = {Sharon, Guni and Stern, Roni and Felner, Ariel and Sturtevant, Nathan R.},
+    title = {Conflict-Based Search for Optimal Multi-Agent Pathfinding},
+    journal = {Artificial Intelligence},
+    volume = {219},
+    pages = {40--66},
+    year = {2015},
+    doi = {10.1016/j.artint.2014.11.006}
+}
+
+@article{Silver2005,
+    author = {Silver, David},
+    title = {Cooperative Pathfinding},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence and Interactive Digital Entertainment},
+    pages = {117--122},
+    year = {2005}
+}
+
+% =============================================================================
+% SIMULATION AND ARDUPILOT
+% =============================================================================
+
+@manual{ArduPilot2024,
+    author = {{ArduPilot Development Team}},
+    title = {{ArduPilot} Documentation},
+    year = {2024},
+    url = {https://ardupilot.org/ardupilot/},
+    note = {Accessed: 2024-12-01}
+}
+
+@inproceedings{Meier2015,
+    author = {Meier, Lorenz and Honegger, Dominik and Pollefeys, Marc},
+    title = {{PX4}: A Node-Based Multithreaded Open Source Robotics Framework for Deeply Embedded Platforms},
+    booktitle = {Proceedings of the IEEE International Conference on Robotics and Automation},
+    pages = {6235--6240},
+    year = {2015},
+    doi = {10.1109/ICRA.2015.7140074}
+}
+
+@article{Shah2018,
+    author = {Shah, Shital and Dey, Debadeepta and Lovett, Chris and Kapoor, Ashish},
+    title = {{AirSim}: High-Fidelity Visual and Physical Simulation for Autonomous Vehicles},
+    booktitle = {Field and Service Robotics},
+    pages = {621--635},
+    year = {2018},
+    doi = {10.1007/978-3-319-67361-5_40}
+}
+
+@article{Koenig2004Gazebo,
+    author = {Koenig, Nathan and Howard, Andrew},
+    title = {Design and Use Paradigms for {Gazebo}, An Open-Source Multi-Robot Simulator},
+    booktitle = {Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems},
+    pages = {2149--2154},
+    year = {2004},
+    doi = {10.1109/IROS.2004.1389727}
+}
+
+% =============================================================================
+% DYNAMIC AND UNKNOWN ENVIRONMENTS
+% =============================================================================
+
+@article{Ferguson2006,
+    author = {Ferguson, Dave and Stentz, Anthony},
+    title = {Using Interpolation to Improve Path Planning: The {Field D*} Algorithm},
+    journal = {Journal of Field Robotics},
+    volume = {23},
+    number = {2},
+    pages = {79--101},
+    year = {2006},
+    doi = {10.1002/rob.20109}
+}
+
+@inproceedings{Likhachev2005,
+    author = {Likhachev, Maxim and Ferguson, Dave and Gordon, Geoffrey and Stentz, Anthony and Thrun, Sebastian},
+    title = {Anytime Dynamic {A*}},
+    booktitle = {Advances in Neural Information Processing Systems},
+    volume = {17},
+    year = {2005}
+}
+
+@article{Koenig2005,
+    author = {Koenig, Sven and Likhachev, Maxim and Liu, Yaxin and Furcy, David},
+    title = {Incremental Heuristic Search in {AI}},
+    journal = {AI Magazine},
+    volume = {25},
+    number = {2},
+    pages = {99--112},
+    year = {2004}
+}
+
+% =============================================================================
+% PARALLEL AND GPU-ACCELERATED PATHFINDING
+% =============================================================================
+
+@article{Bleiweiss2008,
+    author = {Bleiweiss, Avi},
+    title = {{GPU} Accelerated Pathfinding},
+    booktitle = {Proceedings of the ACM SIGGRAPH/EUROGRAPHICS Conference on Graphics Hardware},
+    pages = {65--74},
+    year = {2008}
+}
+
+@inproceedings{Zhou2015,
+    author = {Zhou, Yichao and Zeng, Jianmin},
+    title = {Massively Parallel {A*} Search on a {GPU}},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {1248--1254},
+    year = {2015}
+}
+
+@article{Edelkamp2010,
+    author = {Edelkamp, Stefan and Sulewski, Damian and Y\"{u}cel, Cengizhan},
+    title = {Perfect Hashing for State Space Exploration on the {GPU}},
+    booktitle = {Proceedings of the International Conference on Automated Planning and Scheduling},
+    pages = {57--64},
+    year = {2010}
+}
+
+% =============================================================================
+% CORRIDOR AND BOUNDED SEARCH
+% =============================================================================
+
+@article{Botea2013,
+    author = {Botea, Adi and Harabor, Daniel},
+    title = {Path Planning with Compressed All-Pairs Shortest Paths Data},
+    booktitle = {Proceedings of the International Conference on Automated Planning and Scheduling},
+    pages = {293--297},
+    year = {2013}
+}
+
+@inproceedings{Geisberger2008,
+    author = {Geisberger, Robert and Sanders, Peter and Schultes, Dominik and Delling, Daniel},
+    title = {Contraction Hierarchies: Faster and Simpler Hierarchical Routing in Road Networks},
+    booktitle = {Proceedings of the International Workshop on Experimental Algorithms},
+    pages = {319--333},
+    year = {2008},
+    doi = {10.1007/978-3-540-68552-4_24}
+}
+
+@article{Bast2016,
+    author = {Bast, Hannah and Delling, Daniel and Goldberg, Andrew and M\"{u}ller-Hannemann, Matthias and Pajor, Thomas and Sanders, Peter and Wagner, Dorothea and Werneck, Renato F.},
+    title = {Route Planning in Transportation Networks},
+    journal = {Algorithm Engineering},
+    pages = {19--80},
+    year = {2016},
+    doi = {10.1007/978-3-319-49487-6_2}
+}
+
+% =============================================================================
+% EVALUATION BENCHMARKS
+% =============================================================================
+
+@misc{MovingAI,
+    author = {Sturtevant, Nathan R.},
+    title = {Moving {AI} Lab Pathfinding Benchmarks},
+    year = {2012},
+    url = {https://movingai.com/benchmarks/},
+    note = {Accessed: 2024-12-01}
+}
+
+@inproceedings{Stern2019SoCS,
+    author = {Stern, Roni and Sturtevant, Nathan},
+    title = {Pathfinding Benchmarks},
+    booktitle = {Symposium on Combinatorial Search},
+    year = {2019}
+}
+
+% =============================================================================
+% PRECOMPUTATION AND DATABASES
+% =============================================================================
+
+@article{Strasser2015,
+    author = {Strasser, Ben and Harabor, Daniel and Botea, Adi},
+    title = {Fast First-Move Queries through Run-Length Encoding},
+    booktitle = {Proceedings of the Symposium on Combinatorial Search},
+    pages = {157--165},
+    year = {2015}
+}
+
+@inproceedings{Goldenberg2011,
+    author = {Goldenberg, Meir and Felner, Ariel and Stern, Roni and Sturtevant, Nathan},
+    title = {A* Variants for Optimal Multi-Agent Pathfinding},
+    booktitle = {Proceedings of the Symposium on Combinatorial Search},
+    year = {2012}
+}
+
+% =============================================================================
+% THEORETICAL FOUNDATIONS
+% =============================================================================
+
+@book{Tarjan1983,
+    author = {Tarjan, Robert Endre},
+    title = {Data Structures and Network Algorithms},
+    publisher = {Society for Industrial and Applied Mathematics},
+    address = {Philadelphia, PA},
+    year = {1983},
+    doi = {10.1137/1.9781611970265}
+}
+
+@article{Fredman1987,
+    author = {Fredman, Michael L. and Tarjan, Robert Endre},
+    title = {Fibonacci Heaps and Their Uses in Improved Network Optimization Algorithms},
+    journal = {Journal of the ACM},
+    volume = {34},
+    number = {3},
+    pages = {596--615},
+    year = {1987},
+    doi = {10.1145/28869.28874}
+}
+
+@article{Thorup2000,
+    author = {Thorup, Mikkel},
+    title = {On {RAM} Priority Queues},
+    journal = {SIAM Journal on Computing},
+    volume = {30},
+    number = {1},
+    pages = {86--109},
+    year = {2000},
+    doi = {10.1137/S0097539795288246}
+}
+
+% =============================================================================
+% ADDITIONAL REFERENCES
+% =============================================================================
+
+@book{Nilsson1980,
+    author = {Nilsson, Nils J.},
+    title = {Principles of Artificial Intelligence},
+    publisher = {Morgan Kaufmann},
+    address = {San Francisco, CA},
+    year = {1980},
+    isbn = {978-0-934613-10-1}
+}
+
+@article{Delling2009,
+    author = {Delling, Daniel and Sanders, Peter and Schultes, Dominik and Wagner, Dorothea},
+    title = {Engineering Route Planning Algorithms},
+    journal = {Algorithmics of Large and Complex Networks},
+    pages = {117--139},
+    year = {2009},
+    doi = {10.1007/978-3-642-02094-0_7}
+}
+
+@inproceedings{Wilt2012,
+    author = {Wilt, Christopher and Ruml, Wheeler},
+    title = {When Does Weighted {A*} Fail?},
+    booktitle = {Proceedings of the Symposium on Combinatorial Search},
+    pages = {137--144},
+    year = {2012}
+}
+
+@article{Bulitko2016,
+    author = {Bulitko, Vadim and Bj\"{o}rnsson, Yngvi and Sturtevant, Nathan R.},
+    title = {Time-Bounded A*},
+    booktitle = {Proceedings of the AAAI Conference on Artificial Intelligence},
+    pages = {3632--3638},
+    year = {2014}
 }

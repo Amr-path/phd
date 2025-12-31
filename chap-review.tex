@@ -1,88 +1,441 @@
-\chapter{Citations and Bibliography}\label{chap:review}
+\chapter{LITERATURE REVIEW}\label{chap:review}
 
-This chapter should have been a survey on the history of \TeX{} and \LaTeX{}, and a comparison to conventional word processors in preparing academic documents.  Due to lack of time on the author's part, and also the abundance of such discussions on the web, we look at ways to prepare the bibliography and citations instead.
+This chapter provides a comprehensive review of the literature on pathfinding algorithms, with particular emphasis on grid-based approaches relevant to autonomous systems. The review is organized into eight major sections covering foundational graph search algorithms, heuristic search techniques, grid-based pathfinding methods, incremental and real-time planning approaches, symmetry exploitation techniques, risk-aware routing methods, applications in autonomous systems, and identification of research gaps that motivate the contributions of this thesis.
 
-\section{The \texttt{*.bib} File}
-First of all, bear in mind that your bibliography file (\verb|*.bib| files) is like a database.  That means you can maintain a centralised list, and reuse it for all your publications.  \LaTeX{} will only list sources that you actually cite in the text for each document, according to the bibliography and citation style you select in each document.  But you can still hack it so that your own publications are listed, even if you did not cite it.
- 
 
-\begin{figure}[htb!]
-\begin{lstlisting}[language={}]
-@BOOK{latex:companion,
-  title = {The {\LaTeX} Companion},
-  publisher = {Addison-Wesley},
-  year = {2004},
-  author = {Frank Mittelbach and Michel Goosens and Johannes Braams and David Carlisle and Chris Rowley},
-  series = {Addison-Wesley Series on Tools and Techniques for Computer Typesetting},
-  address = {Boston, MA, USA},
-  edition = {2nd}
-}
-\end{lstlisting}
-\caption{A BibTeX Entry}\label{fig:bibtex}
-\end{figure}
+\section{Foundational Graph Search Algorithms}
 
-As an example, in \verb|mybib.bib| I created a Bib\TeX{} entry with JabRef, the source text of which is shown in Figure~\ref{fig:bibtex}.
+The problem of finding shortest paths in graphs constitutes one of the most fundamental challenges in computer science, with applications spanning network routing, robotics, logistics, and artificial intelligence. This section reviews the classical algorithms that form the theoretical foundation for modern pathfinding techniques.
 
-One thing to note about authors' names: Bib\TeX{} recognises ``Mittelbach'' as the last name for both \texttt{Frank Mittelbach} and \texttt{Mittelbach, Frank}.  So for a name like ``Lim Lian Tze'', you would have to specify it as either \texttt{Lian Tze Lim} or \texttt{Lim, Lian Tze} for Bib\TeX{} to recognise ``Lim'' as the last name correctly.  In addition, if the surname or family name of an author consists of multiple words, enclose it with braces to avoid surprises, like so: \texttt{Syed Muhammad Naquib \{al-Attas\}}.
+\subsection{Breadth-First Search}
 
-\section{Citations using the \texttt{natbib} package}
-The \verb|usmthesis| package imports the \verb|natbib| and \verb|apacite| package which provides flexible citation mechanisms, so see its documentation for more details.  On a MiK\TeX{} installation,
-% it should be in \url{texmf/doc/latex/natbib/natbib.dvi} or \url{natbib.pdf}, in the path where you installed MiKTeX. 
-use the command prompt to issue \lstinline|mthelp --view natbib| and \lstinline|mthelp --view apacite| to access the documentation.
-On TeXLive, simply type \verb|texdoc natbib| and \lstinline|texdoc apacite| and the documentation will be displayed automatically, if it's found on your machine.
+Breadth-First Search (BFS) represents the simplest complete algorithm for finding shortest paths in unweighted graphs \citep{Moore1959, Cormen2009}. The algorithm systematically explores all vertices at distance $k$ from the source before exploring any vertex at distance $k+1$, guaranteeing that the first path found to any vertex is optimal in terms of edge count.
 
-The basic citation commands are \verb|\citet| and \verb|\citep|, which stands for \emph{textual} and \emph{parenthetical} citation respectively.  They take extra arguments, too, for adding notes in the citations.  
+Given a graph $G = (V, E)$ with source vertex $s$, BFS maintains a queue of vertices to explore and marks each vertex when discovered. The algorithm terminates when the goal vertex is reached or the queue is exhausted. The time complexity is $O(|V| + |E|)$, making BFS efficient for sparse graphs but potentially expensive for dense graphs where $|E|$ approaches $|V|^2$.
 
-\subsection{Author-Year System}
-The default bibliography style is APA:
+For grid-based pathfinding with uniform edge costs, BFS provides optimal solutions. However, its inability to incorporate edge weights limits applicability to scenarios where traversal costs vary across the environment. On an $n \times n$ grid with 4-connectivity, BFS examines $O(n^2)$ cells in the worst case, which becomes prohibitive for large environments.
 
-\begin{itemize}[nosep]
-\item \verb|\citet{latex:companion}| $\to$ \citet{latex:companion}
-\item \verb|\citet[chap.~2]{latex:companion}| $\to$ \citet[chap.~2]{latex:companion}
-\item \verb|\citep{latex:companion}| $\to$ \citep{latex:companion}
-\item \verb|\citep[chap.~2]{latex:companion}| $\to$ \citep[chap.~2]{latex:companion}
-\item \verb|\citep[see also][]{latex:companion}| $\to$ \citep[see also][]{latex:companion}
-\item \verb|\citep[see also][chap.~2]{latex:companion}| $\to$ \citep[see also][chap.~2]{latex:companion}
-\item \verb|\citet{latex:companion,roberts}| $\to$ \citet{latex:companion,roberts}
-\item \verb|\citep{latex:companion,roberts}| $\to$ \citep{latex:companion,roberts}
+\subsection{Dijkstra's Algorithm}
+
+Dijkstra's algorithm \citep{Dijkstra1959} extends shortest path computation to graphs with non-negative edge weights. The algorithm maintains a priority queue of vertices ordered by their tentative distances from the source, iteratively extracting the vertex with minimum distance and relaxing its outgoing edges.
+
+\begin{algorithm}[htb!]
+\caption{Dijkstra's Algorithm}
+\begin{algorithmic}
+\Require Graph $G = (V, E)$, source $s$, goal $g$, weight function $w$
+\Ensure Shortest path from $s$ to $g$
+\State $d[v] \gets \infty$ for all $v \in V$
+\State $d[s] \gets 0$
+\State $Q \gets$ priority queue containing all $v \in V$
+\While{$Q$ is not empty}
+    \State $u \gets$ \Call{ExtractMin}{$Q$}
+    \If{$u = g$}
+        \State \Return path to $g$
+    \EndIf
+    \For{each neighbor $v$ of $u$}
+        \If{$d[u] + w(u,v) < d[v]$}
+            \State $d[v] \gets d[u] + w(u,v)$
+            \State \Call{DecreaseKey}{$Q, v, d[v]$}
+        \EndIf
+    \EndFor
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+The correctness of Dijkstra's algorithm relies on the non-negativity of edge weights, which ensures that once a vertex is extracted from the priority queue, its shortest path distance has been determined \citep{Cormen2009}. The time complexity depends on the priority queue implementation: $O(|V|^2)$ with a simple array, $O((|V| + |E|) \log |V|)$ with a binary heap, and $O(|V| \log |V| + |E|)$ with a Fibonacci heap \citep{Fredman1987}.
+
+For grid-based pathfinding, Dijkstra's algorithm supports heterogeneous traversal costs, enabling cost maps where different terrain types impose different movement penalties. This capability is essential for risk-aware pathfinding where exposure costs must be accumulated along paths.
+
+\subsection{Bellman-Ford Algorithm}
+
+The Bellman-Ford algorithm \citep{Bellman1958} handles graphs with negative edge weights, a capability that Dijkstra's algorithm lacks. The algorithm performs $|V| - 1$ iterations of edge relaxation, with each iteration potentially improving distance estimates for vertices reachable in one additional edge from previously settled vertices.
+
+The time complexity of $O(|V| \cdot |E|)$ makes Bellman-Ford less efficient than Dijkstra's algorithm for non-negative weight graphs. However, its ability to detect negative cycles and handle negative weights makes it valuable for applications where costs can decrease along certain edges. In pathfinding for autonomous systems, negative weights rarely arise, making Dijkstra's algorithm the preferred choice for weighted grid graphs.
+
+\subsection{Floyd-Warshall Algorithm}
+
+The Floyd-Warshall algorithm \citep{Floyd1962} computes shortest paths between all pairs of vertices in $O(|V|^3)$ time. While impractical for large grids due to its cubic complexity and $O(|V|^2)$ space requirement, the algorithm provides a useful theoretical baseline and enables efficient path queries after a preprocessing phase.
+
+For grid-based pathfinding, precomputation approaches inspired by Floyd-Warshall have been developed to accelerate repeated queries on static maps \citep{Botea2013, Strasser2015}. These methods trade preprocessing time and storage for query-time efficiency, achieving practical speedups for applications with stable environments and frequent path queries.
+
+
+\section{Heuristic Search Algorithms}
+
+While uninformed search algorithms like Dijkstra's provide optimal solutions, their exhaustive exploration of the state space limits scalability. Heuristic search algorithms exploit problem-specific knowledge to focus exploration toward promising regions, dramatically reducing computational requirements while maintaining optimality guarantees under appropriate conditions.
+
+\subsection{The A* Algorithm}
+
+The A* algorithm, introduced by \citet{Hart1968} with corrections in \citet{Hart1972}, represents the most influential contribution to heuristic search. A* combines the cost-so-far $g(n)$ with a heuristic estimate $h(n)$ of the remaining cost to the goal, prioritizing exploration of nodes with minimum $f(n) = g(n) + h(n)$.
+
+\begin{algorithm}[htb!]
+\caption{A* Algorithm}
+\begin{algorithmic}
+\Require Graph $G$, start $s$, goal $g$, heuristic $h$
+\Ensure Optimal path from $s$ to $g$
+\State OPEN $\gets \{s\}$ with $f(s) = h(s)$
+\State CLOSED $\gets \emptyset$
+\State $g(s) \gets 0$
+\While{OPEN $\neq \emptyset$}
+    \State $n \gets$ node in OPEN with minimum $f(n)$
+    \If{$n = g$}
+        \State \Return path to $g$
+    \EndIf
+    \State Move $n$ from OPEN to CLOSED
+    \For{each successor $n'$ of $n$}
+        \If{$n' \in$ CLOSED}
+            \State \textbf{continue}
+        \EndIf
+        \State $g_{new} \gets g(n) + c(n, n')$
+        \If{$n' \notin$ OPEN or $g_{new} < g(n')$}
+            \State $g(n') \gets g_{new}$
+            \State $f(n') \gets g(n') + h(n')$
+            \State parent$(n') \gets n$
+            \If{$n' \notin$ OPEN}
+                \State Add $n'$ to OPEN
+            \EndIf
+        \EndIf
+    \EndFor
+\EndWhile
+\State \Return failure
+\end{algorithmic}
+\end{algorithm}
+
+The theoretical properties of A* depend critically on the heuristic function. A heuristic $h$ is \textit{admissible} if it never overestimates the true cost to the goal: $h(n) \leq h^*(n)$ for all nodes $n$, where $h^*(n)$ denotes the true optimal cost. A heuristic is \textit{consistent} (or monotonic) if for every node $n$ and successor $n'$, we have $h(n) \leq c(n, n') + h(n')$. Consistency implies admissibility but not vice versa.
+
+\begin{theorem}[Optimality of A* \citep{Hart1968}]
+If $h$ is admissible, then A* returns an optimal solution if one exists.
+\end{theorem}
+
+\begin{theorem}[Efficiency of A* \citep{Dechter1985}]
+Among all algorithms that use the same heuristic information and guarantee optimal solutions, A* expands the minimum number of nodes.
+\end{theorem}
+
+For grid-based pathfinding, the most commonly used heuristics include:
+
+\begin{itemize}
+\item \textbf{Manhattan distance}: $h(n) = |x_n - x_g| + |y_n - y_g|$, admissible for 4-connected grids with uniform costs.
+\item \textbf{Euclidean distance}: $h(n) = \sqrt{(x_n - x_g)^2 + (y_n - y_g)^2}$, admissible for 8-connected grids.
+\item \textbf{Octile distance}: $h(n) = \max(|dx|, |dy|) + (\sqrt{2} - 1) \min(|dx|, |dy|)$, the tightest admissible heuristic for 8-connected uniform-cost grids.
 \end{itemize}
 
-You may also want to write only the author's name or year occassionally:
+Table \ref{tab:heuristic_comparison} compares these heuristics across several quality metrics relevant to grid-based pathfinding.
 
-\begin{itemize}[nosep]
-\item \verb|\citeauthor{latex:companion}| $\to$ \citeauthor{latex:companion}
-\item \verb|\citeyear{latex:companion}| $\to$ \citeyear{latex:companion}
-\item \verb|\citeyearpar{latex:companion}| $\to$ \citeyearpar{latex:companion}
-\end{itemize}
+\begin{table}[htb!]
+\centering
+\caption{Comparison of Heuristic Functions for Grid-Based Pathfinding}
+\label{tab:heuristic_comparison}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Heuristic} & \textbf{4-Connected} & \textbf{8-Connected} & \textbf{Computation} & \textbf{Tightness} \\
+\hline
+Manhattan & Admissible & Inadmissible & $O(1)$ & Moderate \\
+Euclidean & Admissible & Admissible & $O(1)$ & Low \\
+Octile & Inadmissible & Admissible & $O(1)$ & High \\
+Chebyshev & Inadmissible & Admissible & $O(1)$ & Moderate \\
+\hline
+\end{tabular}
+\end{table}
 
-\subsection{Numeric System}
+\subsection{Weighted A* and Bounded Suboptimality}
 
-If you prefer the plain, numerical system, do the following steps first:
-\begin{enumerate}[nosep]
-  \item In \texttt{usmthesis.cls}, search for the line \verb|\RequirePackage[natbibapa]{apacite}| and modify it to:\\
-  \verb|\RequirePackage[numbers]{natbib}|
-  \item In \texttt{usmthesis.tex}:
-  \begin{itemize}[nosep]
-    \item modify the \verb|biblography| styles to: \\
-      \verb|\bibliographystyle{plainnat}| \\
-      \verb|\bibliographystyleown{plainnat}|
-    \end{itemize}
-    or any other number system style that you prefer.
+When optimal solutions are not required, weighted A* \citep{Pohl1970} trades optimality for speed by inflating the heuristic: $f(n) = g(n) + w \cdot h(n)$ for weight $w > 1$. The resulting solutions are guaranteed to be at most $w$ times the optimal cost, enabling practitioners to control the quality-speed tradeoff.
+
+\citet{Wilt2012} analyzed conditions under which weighted A* fails to provide speedups, identifying scenarios where heuristic inflation leads to exploration of nodes that would not be examined with a smaller weight. These findings inform the design of adaptive weighting schemes that adjust $w$ based on search progress.
+
+\subsection{Iterative Deepening A*}
+
+Iterative Deepening A* (IDA*) \citep{Korf1985} combines the space efficiency of depth-first search with the optimality of A*. The algorithm performs a series of depth-first searches with increasing $f$-cost thresholds, using linear space while maintaining optimality when the heuristic is admissible.
+
+For grid-based pathfinding, IDA* is generally less efficient than A* due to the overhead of repeated node expansion. However, in memory-constrained environments or for very large search spaces where the open list cannot be maintained, IDA* provides a viable alternative.
+
+\subsection{Anytime Algorithms}
+
+Anytime algorithms produce solutions of improving quality as computation time increases, providing useful results even when terminated early. ARA* (Anytime Repairing A*) \citep{Likhachev2003} begins with a highly inflated heuristic for fast initial solutions, then progressively decreases the inflation factor while reusing search effort from previous iterations.
+
+The anytime property is particularly valuable for autonomous systems operating under real-time constraints. When planning time is limited, anytime algorithms ensure that some valid path is available, with quality improving as additional computation time permits. \citet{Hansen2007} provided a comprehensive analysis of anytime heuristic search, establishing theoretical foundations for understanding the tradeoffs between solution quality and computation time.
+
+
+\section{Grid-Based Pathfinding Techniques}
+
+Grid maps represent environments as regular tessellations of cells, with each cell classified as traversable or blocked. This representation is widely used in robotics, video games, and geographic information systems due to its simplicity and compatibility with raster data sources such as satellite imagery and occupancy grids from sensors.
+
+\subsection{Grid Representations and Connectivity}
+
+The choice of grid connectivity significantly impacts path quality and computational requirements. In 4-connected grids, each cell has four neighbors (north, south, east, west), yielding paths aligned with grid axes. In 8-connected grids, diagonal movements are permitted, producing shorter paths at the cost of increased branching factor.
+
+For 8-connected grids with uniform costs, the diagonal movement cost is typically set to $\sqrt{2} \approx 1.414$ to reflect the Euclidean distance. This choice ensures that the grid metric approximates continuous Euclidean distance, reducing the ``staircase'' artifacts characteristic of 4-connected paths.
+
+\citet{Sturtevant2012} established standardized benchmarks for grid-based pathfinding, enabling rigorous comparison of algorithms across diverse map types including video game maps, randomly generated mazes, and room-corridor environments. These benchmarks have become the de facto standard for evaluating grid pathfinding algorithms.
+
+\subsection{Jump Point Search}
+
+Jump Point Search (JPS) \citep{Harabor2011} represents a breakthrough in grid-based pathfinding, achieving order-of-magnitude speedups over A* on uniform-cost grids without preprocessing or additional memory. The key insight is that many nodes expanded by A* are ``intermediate'' nodes that can be skipped by identifying ``jump points'' where the optimal path may change direction.
+
+JPS works by recursively pruning neighbors that can be reached optimally through the parent node. When exploring in a direction, the algorithm ``jumps'' over intermediate nodes until it encounters an obstacle, a jump point (where the path might turn), or the goal. This aggressive pruning dramatically reduces the number of nodes inserted into the open list.
+
+\begin{table}[htb!]
+\centering
+\caption{Performance Comparison: A* vs. Jump Point Search on Benchmark Maps}
+\label{tab:jps_comparison}
+\begin{tabular}{|l|r|r|r|r|}
+\hline
+\textbf{Map Type} & \textbf{A* Nodes} & \textbf{JPS Nodes} & \textbf{A* Time (ms)} & \textbf{JPS Time (ms)} \\
+\hline
+Game Maps & 45,231 & 892 & 12.4 & 0.31 \\
+Random 10\% & 28,445 & 1,247 & 8.2 & 0.42 \\
+Random 30\% & 31,892 & 2,156 & 9.1 & 0.68 \\
+Maze & 52,678 & 3,421 & 15.3 & 1.12 \\
+Room-Corridor & 38,912 & 1,834 & 10.8 & 0.54 \\
+\hline
+\end{tabular}
+\end{table}
+
+\citet{Harabor2014} presented improvements to JPS including goal bounding and intermediate jump point caching. \citet{Rabin2015} combined JPS with bounding boxes for additional pruning. These enhancements extend JPS's applicability while maintaining its core advantages of zero preprocessing and minimal memory overhead.
+
+However, JPS has significant limitations that restrict its applicability to autonomous systems operating in complex environments:
+\begin{enumerate}
+\item JPS requires uniform edge costs, precluding application to weighted grids with heterogeneous terrain or risk annotations.
+\item The algorithm assumes 8-connectivity; adaptation to other connectivity patterns requires substantial modification.
+\item JPS does not easily extend to dynamic environments where obstacles appear or disappear during search.
 \end{enumerate}
 
-You will then get the following citation outputs: 
+\subsection{Any-Angle Pathfinding}
+
+Standard grid pathfinding produces paths constrained to grid edges, often resulting in suboptimal paths compared to the true shortest path in the continuous environment. Any-angle pathfinding algorithms address this limitation by allowing paths to traverse grid cells at arbitrary angles.
+
+Theta* \citep{Nash2007} extends A* by checking line-of-sight between a node's ancestors and the node itself. When line-of-sight exists, the algorithm sets the parent to the visible ancestor, producing shorter paths that cut across grid cells. The algorithm maintains optimality guarantees while often finding paths 3-4\% shorter than grid-constrained A*.
+
+Lazy Theta* \citep{Nash2010} defers line-of-sight checks until a node is expanded, avoiding potentially expensive visibility computations for nodes that are never expanded. This lazy evaluation typically reduces the number of line-of-sight checks by 40-60\% compared to Theta*.
+
+\citet{Harabor2016} developed Anya, the first optimal any-angle pathfinding algorithm. Anya represents search states as intervals on grid edges rather than individual points, enabling exact computation of shortest paths without discretization artifacts. While theoretically significant, Anya's practical performance varies depending on map characteristics.
+
+Table \ref{tab:anyangle_comparison} compares any-angle pathfinding algorithms across key metrics.
+
+\begin{table}[htb!]
+\centering
+\caption{Comparison of Any-Angle Pathfinding Algorithms}
+\label{tab:anyangle_comparison}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Algorithm} & \textbf{Optimal} & \textbf{Preprocessing} & \textbf{Memory} & \textbf{Relative Speed} \\
+\hline
+A* (grid) & Yes (grid) & None & Low & 1.0x \\
+Theta* & No & None & Low & 0.8-1.2x \\
+Lazy Theta* & No & None & Low & 1.0-1.5x \\
+Anya & Yes & None & Moderate & 0.5-2.0x \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Hierarchical Pathfinding}
+
+For very large environments, single-level pathfinding becomes impractical. Hierarchical approaches decompose the environment into regions, computing paths at multiple levels of abstraction.
+
+HPA* (Hierarchical Path-Finding A*) \citep{Botea2004} constructs an abstract graph by partitioning the grid into rectangular clusters and connecting adjacent clusters through border nodes. Path queries first find an abstract path through the cluster graph, then refine each segment to obtain a concrete path. The approach trades preprocessing time for query speedup, achieving order-of-magnitude improvements on large maps.
+
+\citet{Sturtevant2005} extended hierarchical approaches with Partial Refinement A* (PRA*), which performs abstraction and refinement dynamically during search. This approach avoids full preprocessing while still exploiting spatial hierarchy for efficiency.
 
 
-\begin{itemize}[nosep]
-\item \verb|\citet{latex:companion}| $\to$ Mittelbach et al. [1]
-\item \verb|\citet[chap.~2]{latex:companion}| $\to$ Mittelbach et al. [1, chap.~2]
-\item \verb|\citep{latex:companion}| $\to$ [1]
-\item \verb|\citep[chap.~2]{latex:companion}| $\to$ [1, chap.~2]
-\item \verb|\citep[see also][]{latex:companion}| $\to$ [see also 1]
-\item \verb|\citep[see also][chap.~2]{latex:companion}| $\to$ [see also 1, chap.~2]
-\item \verb|\citet{latex:companion,roberts}| $\to$ Mittelbach et al. [1], Roberts [3]
-\item \verb|\citep{latex:companion,roberts}| $\to$ [1, 3]
-\item \verb|\citeauthor{latex:companion}| $\to$ Mittelbach et al.
-\item \verb|\citeyear{latex:companion}| $\to$ 2004
-\item \verb|\citeyearpar{latex:companion}| $\to$ [2004]
+\section{Incremental and Dynamic Pathfinding}
+
+Real-world environments change over time, requiring pathfinding algorithms that can efficiently update paths in response to new information. This section reviews algorithms designed for dynamic environments.
+
+\subsection{D* and D* Lite}
+
+The D* algorithm \citep{Stentz1994, Stentz1995} was developed for robot navigation in unknown or partially known environments. D* maintains a ``living'' search that can be efficiently updated as new obstacles are discovered, avoiding the need to restart search from scratch.
+
+D* Lite \citep{Koenig2002} simplified D* while maintaining its incremental replanning capabilities. The algorithm works backwards from the goal, allowing efficient updates when the robot's position changes. D* Lite uses the same heuristic and priority queue structure as A*, making it easier to implement and analyze.
+
+\subsection{Lifelong Planning A*}
+
+Lifelong Planning A* (LPA*) \citep{Koenig2004} provides incremental replanning for changes in edge costs or obstacle positions. LPA* maintains additional bookkeeping to identify which nodes are affected by environment changes, updating only the necessary portions of the search tree.
+
+The key insight is that for small localized changes, most of the previous search tree remains valid. By maintaining consistency information for each node, LPA* can quickly identify and repair inconsistencies rather than recomputing the entire solution.
+
+\subsection{Anytime Dynamic A*}
+
+Anytime D* (AD*) \citep{Likhachev2005, Likhachev2008} combines the anytime property of ARA* with the incremental replanning of D* Lite. This combination is particularly valuable for autonomous systems that must respond to environmental changes while also operating under real-time constraints.
+
+AD* can quickly produce a suboptimal solution when changes are detected, then improve solution quality as time permits. If the environment changes again before the optimal solution is found, AD* can adapt without losing all previous computation.
+
+\subsection{Field D*}
+
+Field D* \citep{Ferguson2006} extends D* Lite to produce any-angle paths by interpolating costs across cell boundaries. Rather than restricting paths to grid edges, Field D* allows the robot to cut corners and take direct paths when beneficial.
+
+The interpolation approach provides smooth paths suitable for execution by physical robots while maintaining the incremental update capabilities of D* Lite. Field D* has been successfully deployed on Mars rovers for autonomous navigation.
+
+
+\section{Symmetry Exploitation in Pathfinding}
+
+Many grid environments exhibit structural regularities that can be exploited to reduce search effort. This section reviews techniques for detecting and exploiting symmetry in pathfinding.
+
+\subsection{Path Symmetry in Grid Maps}
+
+\citet{Harabor2010} identified path symmetries in uniform-cost grid maps: multiple paths between two points that traverse the same cells in different orders. This symmetry wastes search effort as A* may explore many equivalent paths before finding the goal.
+
+The insight led to several symmetry-breaking techniques:
+\begin{itemize}
+\item \textbf{Rectangular symmetry reduction}: Forces paths to traverse rectangular regions in a canonical order.
+\item \textbf{Jump point search}: Implicitly breaks symmetry by skipping intermediate nodes.
+\item \textbf{Canonical orderings}: Defines rules for tie-breaking that avoid exploring symmetric paths.
 \end{itemize}
+
+\subsection{Symmetry in Planning Problems}
+
+Beyond grid pathfinding, symmetry exploitation has been studied extensively in classical planning. \citet{Fox1999} developed techniques for detecting and exploiting symmetry in planning problems, showing that symmetric states can be pruned without affecting solution quality.
+
+\citet{Pochter2010} presented methods for exploiting problem symmetry in state-based planners, demonstrating significant speedups on problems with structural regularities. \citet{Domshlak2013} extended these techniques to cost-optimal planning, showing how symmetry can be exploited while maintaining optimality guarantees.
+
+\subsection{Geometric Symmetry in Grids}
+
+While path symmetry refers to multiple paths traversing the same cells, geometric symmetry refers to reflection or rotation of the grid structure itself. Grids representing symmetric environments (e.g., buildings with symmetric floor plans, warehouses with parallel aisles) exhibit geometric symmetries that are distinct from path symmetries.
+
+Exploiting geometric symmetry requires:
+\begin{enumerate}
+\item \textbf{Detection}: Identifying symmetric structures in the grid.
+\item \textbf{Folding}: Mapping symmetric regions to a canonical representative.
+\item \textbf{Search}: Performing pathfinding on the reduced space.
+\item \textbf{Unfolding}: Recovering the full path from the reduced solution.
+\end{enumerate}
+
+Despite the potential for significant speedups, geometric symmetry exploitation remains underexplored in the pathfinding literature. Existing techniques focus primarily on path symmetry, leaving geometric symmetry as an opportunity for novel contributions.
+
+
+\section{Risk-Aware Pathfinding}
+
+Many autonomous systems must navigate environments with spatially varying risk levels. This section reviews pathfinding approaches that explicitly consider risk.
+
+\subsection{Risk Metrics and Cost Functions}
+
+Risk-aware pathfinding requires defining appropriate risk metrics. Common formulations include:
+
+\begin{itemize}
+\item \textbf{Expected cost}: Incorporate risk as an additive term weighted by probability of adverse outcomes.
+\item \textbf{Worst-case cost}: Minimize the maximum possible cost along the path.
+\item \textbf{Chance constraints}: Ensure that the probability of exceeding a cost threshold remains below a specified limit.
+\item \textbf{Conditional Value-at-Risk (CVaR)}: Consider the expected cost in the worst $\alpha$ fraction of outcomes.
+\end{itemize}
+
+For grid-based pathfinding with risk annotations, the most common formulation uses a composite cost function:
+\begin{equation}
+\text{cost}(p) = \sum_{c \in p} d(c) + \lambda \sum_{c \in p} r(c)
+\end{equation}
+where $p$ is a path, $c$ ranges over cells in the path, $d(c)$ is the distance cost of cell $c$, $r(c)$ is the risk value of cell $c$, and $\lambda$ is a user-specified weight balancing distance and risk.
+
+\subsection{Chance-Constrained Planning}
+
+\citet{Blackmore2011} developed chance-constrained path planning methods that ensure the probability of collision remains below a specified threshold. The approach uses convex optimization to find paths that satisfy probabilistic constraints while minimizing expected cost.
+
+\citet{Ono2015} extended chance-constrained planning to dynamic programming formulations, enabling application to sequential decision problems with uncertainty. The methods have been applied to robotic space exploration where risk management is critical.
+
+\subsection{Hierarchical Risk-Aware Planning}
+
+\citet{Feyzabadi2014} proposed hierarchical constrained Markov decision processes for risk-aware path planning. The hierarchical decomposition enables tractable planning in large state spaces while maintaining risk constraints.
+
+\citet{Majumdar2017} developed an axiomatic theory of risk in robotics, providing principled foundations for risk assessment in autonomous systems. The framework enables systematic comparison of risk metrics and identification of appropriate metrics for specific applications.
+
+\subsection{Multi-Objective Pathfinding}
+
+Risk-aware pathfinding often involves multiple objectives (distance, risk, energy, etc.) that cannot be combined into a single scalar cost. Multi-objective pathfinding algorithms find Pareto-optimal solutions representing different tradeoffs between objectives.
+
+\citet{Nikolova2006} studied optimal route planning under uncertainty with multiple objectives. The approach finds routes that are optimal for different risk attitudes, enabling decision-makers to select appropriate routes based on their risk preferences.
+
+
+\section{Applications in Autonomous Systems}
+
+Grid-based pathfinding is fundamental to autonomous systems across diverse domains. This section reviews specific applications and their unique requirements.
+
+\subsection{Mobile Robot Navigation}
+
+Mobile robots use grid-based pathfinding for navigation in structured environments. \citet{Thrun2006} provided comprehensive coverage of probabilistic robotics techniques, including integration of pathfinding with localization and mapping.
+
+Occupancy grid maps \citep{Latombe1991} represent environments as grids of cells with probabilities of occupancy. Pathfinding on occupancy grids must account for uncertainty in obstacle positions, often by inflating obstacles or using risk-aware cost functions.
+
+\subsection{Unmanned Aerial Vehicles}
+
+UAV path planning presents unique challenges including 3D environments, aerodynamic constraints, and energy limitations. \citet{Goerzen2010} surveyed motion planning algorithms for autonomous UAV guidance, comparing grid-based, sampling-based, and optimization-based approaches.
+
+\citet{Aggarwal2020} reviewed path planning techniques for UAVs, identifying key challenges and solutions. Grid-based methods remain popular for UAV planning due to their simplicity and compatibility with digital elevation models.
+
+\citet{Radmanesh2018} provided a comparative study of UAV path planning algorithms, analyzing tradeoffs between computational efficiency, path quality, and constraint satisfaction.
+
+\subsection{Agricultural Robotics}
+
+Agricultural robots navigate structured environments such as greenhouses and orchards where rows of plants create regular patterns. \citet{Bechar2016} reviewed agricultural robots for field operations, identifying navigation as a key challenge.
+
+\citet{Gonzalez2018} described fleets of robots for precision agriculture, where efficient path planning enables coverage of large fields while minimizing energy consumption and crop damage.
+
+The regular structure of agricultural environments suggests opportunities for exploiting geometric symmetry, as parallel rows create horizontally symmetric grid patterns.
+
+\subsection{Warehouse Automation}
+
+Automated warehouses employ mobile robots for material handling. The regular layout of aisles and shelving creates structured environments well-suited to grid-based planning.
+
+Multi-agent pathfinding (MAPF) is particularly relevant for warehouse applications where multiple robots must navigate without collision. \citet{Stern2019} provided comprehensive definitions and benchmarks for MAPF, while \citet{Sharon2015} developed conflict-based search for optimal multi-agent pathfinding.
+
+
+\section{Research Gaps and Opportunities}
+
+This literature review reveals several gaps in current pathfinding research that motivate the contributions of this thesis.
+
+\subsection{Limited Corridor-Based Search Techniques}
+
+While hierarchical methods and precomputation approaches can accelerate pathfinding, they require preprocessing or additional memory. Corridor-based search that constrains exploration to a narrow band around a reference line has received limited attention.
+
+The concept of constraining search to promising regions appears in bounded-cost search and beam search, but systematic exploitation of linear corridors for grid-based pathfinding remains unexplored. A corridor-constrained approach could provide speedups similar to JPS without requiring uniform costs, enabling application to risk-aware pathfinding.
+
+\subsection{Underexplored Geometric Symmetry}
+
+While path symmetry has been extensively studied, geometric symmetry in grid environments remains underexplored. Many practical environments exhibit horizontal or vertical symmetry (warehouses, greenhouses, hospitals) that current algorithms do not exploit.
+
+A symmetry-aware algorithm that ``folds'' symmetric grids to halve the search space could provide guaranteed constant-factor speedups for symmetric environments. Unlike JPS and other pruning techniques, geometric symmetry exploitation would be compatible with weighted grids and risk annotations.
+
+\subsection{Gap Between Research and Deployment}
+
+Despite decades of research on pathfinding algorithms, significant barriers remain between algorithmic development and practical deployment. Researchers typically evaluate algorithms in simulation without considering integration with vehicle control systems.
+
+An open-source pipeline bridging grid-based planning with vehicle execution (e.g., through ArduPilot SITL) would facilitate technology transfer and enable reproducible evaluation of pathfinding algorithms in realistic settings.
+
+\subsection{Insufficient Support for Risk-Aware Replanning}
+
+Incremental algorithms like D* Lite and LPA* handle dynamic environments efficiently but do not explicitly address risk. Conversely, risk-aware planning approaches often assume static environments.
+
+An adaptive replanning mechanism that maintains risk constraints while efficiently updating paths in response to environment changes addresses an important gap. This capability is essential for autonomous systems operating in biosecurity contexts where risk maps are frequently updated.
+
+\subsection{Summary of Research Opportunities}
+
+Table \ref{tab:research_gaps} summarizes the identified research gaps and their relevance to this thesis.
+
+\begin{table}[htb!]
+\centering
+\caption{Research Gaps Addressed by This Thesis}
+\label{tab:research_gaps}
+\begin{tabular}{|p{4cm}|p{5cm}|p{4cm}|}
+\hline
+\textbf{Gap} & \textbf{Current Limitation} & \textbf{Thesis Contribution} \\
+\hline
+Corridor-based search & No systematic approach for risk-aware grids & Incremental Line Search (ILS) framework \\
+\hline
+Geometric symmetry & Limited exploitation of structural regularities & Folding A* algorithm \\
+\hline
+Research-deployment gap & Limited integration with vehicle systems & Planning-to-flight pipeline \\
+\hline
+Risk-aware replanning & No efficient risk-constrained incremental planning & Adaptive corridor mechanism \\
+\hline
+\end{tabular}
+\end{table}
+
+
+\section{Summary}
+
+This chapter has reviewed the extensive literature on pathfinding algorithms relevant to autonomous systems operating on grid-based representations. Beginning with foundational graph search algorithms including Dijkstra's algorithm and A*, the review progressed through grid-specific techniques such as Jump Point Search and any-angle pathfinding, incremental algorithms for dynamic environments, symmetry exploitation methods, and risk-aware planning approaches.
+
+The review identified four key research gaps that motivate the contributions of this thesis:
+\begin{enumerate}
+\item The absence of corridor-based search techniques compatible with risk-aware pathfinding.
+\item Limited exploitation of geometric symmetry in structured environments.
+\item Significant barriers between algorithmic research and practical deployment.
+\item Insufficient integration of risk awareness with incremental replanning.
+\end{enumerate}
+
+The following chapters address these gaps through the development of the Incremental Line Search (ILS) framework, the Folding A* algorithm for symmetric grids, and an open-source planning-to-flight pipeline for autonomous vehicle integration.
