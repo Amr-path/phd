@@ -1,0 +1,88 @@
+This is BibTeX, Version 0.99d (TeX Live 2018)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: usmthesis.aux
+The style file: apacite.bst
+A level-1 auxiliary file: acknowledgements.aux
+A level-1 auxiliary file: loa.aux
+A level-1 auxiliary file: chap-intro.aux
+A level-1 auxiliary file: chap-review.aux
+A level-1 auxiliary file: chap-design.aux
+A level-1 auxiliary file: chap-implementation.aux
+A level-1 auxiliary file: chap-discussion.aux
+A level-1 auxiliary file: chap-conclusion.aux
+A level-1 auxiliary file: app-data.aux
+A level-1 auxiliary file: app-uml.aux
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: mybib.bib
+Warning--entry type for "FAO2023" isn't style-file defined
+--line 11 of file mybib.bib
+Warning--entry type for "Malaysia2023" isn't style-file defined
+--line 72 of file mybib.bib
+Warning--entry type for "ASEAN2024" isn't style-file defined
+--line 80 of file mybib.bib
+Warning--entry type for "CMS2024" isn't style-file defined
+--line 112 of file mybib.bib
+Warning--entry type for "DroneAcademy2023" isn't style-file defined
+--line 128 of file mybib.bib
+Warning--entry type for "DroneRegulations2024" isn't style-file defined
+--line 136 of file mybib.bib
+Warning--entry type for "WCO2023" isn't style-file defined
+--line 185 of file mybib.bib
+Warning--entry type for "MarineDigital2023" isn't style-file defined
+--line 211 of file mybib.bib
+Warning--entry type for "ISO27001" isn't style-file defined
+--line 390 of file mybib.bib
+Warning--I didn't find a database entry for "latex:companion"
+Warning--I didn't find a database entry for "roberts"
+Warning--I didn't find a database entry for "ips:thesis:guideline:2007"
+apacite.bst [2013/07/21 v6.03 APA bibliography style]
+You've used 23 entries,
+            6951 wiz_defined-function locations,
+            1423 strings with 14532 characters,
+and the built_in function-call counts, 39069 in all, are:
+= -- 5143
+> -- 239
+< -- 1796
++ -- 1541
+- -- 86
+* -- 2221
+:= -- 6906
+add.period$ -- 107
+call.type$ -- 23
+change.case$ -- 393
+chr.to.int$ -- 0
+cite$ -- 46
+duplicate$ -- 800
+empty$ -- 1621
+format.name$ -- 340
+if$ -- 7793
+int.to.chr$ -- 0
+int.to.str$ -- 69
+missing$ -- 0
+newline$ -- 527
+num.names$ -- 184
+pop$ -- 899
+preamble$ -- 1
+purify$ -- 94
+quote$ -- 0
+skip$ -- 2896
+stack$ -- 0
+substring$ -- 1643
+swap$ -- 441
+text.length$ -- 68
+text.prefix$ -- 0
+top$ -- 1
+type$ -- 2488
+warning$ -- 0
+while$ -- 124
+width$ -- 0
+write$ -- 579
+(There were 12 warnings)

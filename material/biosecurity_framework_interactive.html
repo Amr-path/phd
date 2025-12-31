@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biosecurity Types Framework - Interactive Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            max-width: 1400px;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        #diagram-container {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+            position: relative;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover {
+            filter: brightness(1.1);
+        }
+
+        .node rect, .node ellipse {
+            stroke-width: 2;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover rect, .node:hover ellipse {
+            stroke-width: 4;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .node text {
+            pointer-events: none;
+            font-weight: 600;
+        }
+
+        .arrow {
+            stroke-width: 2;
+            fill: none;
+            transition: all 0.3s ease;
+        }
+
+        .arrow:hover {
+            stroke-width: 4;
+        }
+
+        .arrow-dashed {
+            stroke-dasharray: 8, 4;
+        }
+
+        .connection-line {
+            animation: dash 20s linear infinite;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -100;
+            }
+        }
+
+        .legend {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+
+        .legend-item.biosec { border-color: #9b59b6; }
+        .legend-item.types { border-color: #27ae60; }
+        .legend-item.cyber { border-color: #e67e22; }
+        .legend-item.domain { border-color: #3498db; }
+        .legend-item.subdomain { border-color: #f39c12; }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .info-panel {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 10px;
+            border: 2px solid #667eea;
+        }
+
+        .info-panel h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .info-panel p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            #diagram-container {
+                height: 600px;
+            }
+            
+            .legend {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .highlight {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Biosecurity Types Framework</h1>
+        <p class="subtitle">Interactive Visualization of Biosecurity and Cybersecurity Integration</p>
+        
+        <div id="diagram-container">
+            <svg viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- Gradients for nodes -->
+                    <linearGradient id="grad-biosec" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#9b59b6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#8e44ad;stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <linearGradient id="grad-types" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2ecc71;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#27ae60;stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <linearGradient id="grad-cyber" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#e67e22;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#d35400;stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <linearGradient id="grad-domain" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <linearGradient id="grad-subdomain" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f39c12;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#e67e22;stop-opacity:1" />
+                    </linearGradient>
+                    
+                    <!-- Arrow markers -->
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#34495e" />
+                    </marker>
+                    
+                    <marker id="arrowhead-red" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+                        <polygon points="0 0, 12 4, 0 8" fill="#e74c3c" />
+                    </marker>
+                </defs>
+                
+                <!-- Level 1: Main Biosecurity -->
+                <g class="node" id="node-biosec" data-info="Main concept encompassing all biosecurity measures">
+                    <ellipse cx="600" cy="80" rx="140" ry="45" fill="url(#grad-biosec)" stroke="#8e44ad" />
+                    <text x="600" y="85" text-anchor="middle" fill="white" font-size="22" font-weight="bold">BIOSECURITY</text>
+                </g>
+                
+                <!-- Level 2: Types of Biosecurity -->
+                <g class="node" id="node-agri" data-info="Protection of crops, livestock, and aquaculture from pests and diseases">
+                    <rect x="50" y="180" width="180" height="70" rx="10" fill="url(#grad-types)" stroke="#27ae60" />
+                    <text x="140" y="208" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Agricultural</text>
+                    <text x="140" y="228" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Biosecurity</text>
+                </g>
+                
+                <g class="node" id="node-public" data-info="Protection of human populations from infectious disease threats">
+                    <rect x="280" y="180" width="180" height="70" rx="10" fill="url(#grad-types)" stroke="#27ae60" />
+                    <text x="370" y="208" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Public Health</text>
+                    <text x="370" y="228" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Biosecurity</text>
+                </g>
+                
+                <g class="node" id="node-env" data-info="Protection of ecosystems and biodiversity from invasive species">
+                    <rect x="510" y="180" width="180" height="70" rx="10" fill="url(#grad-types)" stroke="#27ae60" />
+                    <text x="600" y="208" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Environmental</text>
+                    <text x="600" y="228" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Biosecurity</text>
+                </g>
+                
+                <g class="node" id="node-lab" data-info="Protection of dangerous pathogens and laboratory biosafety measures">
+                    <rect x="740" y="180" width="180" height="70" rx="10" fill="url(#grad-types)" stroke="#27ae60" />
+                    <text x="830" y="208" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Laboratory</text>
+                    <text x="830" y="228" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Biosecurity</text>
+                </g>
+                
+                <!-- Level 3: Cybersecurity (Central) -->
+                <g class="node" id="node-cyber" data-info="Digital security enabling and protecting all biosecurity domains">
+                    <rect x="350" y="340" width="500" height="80" rx="15" fill="url(#grad-cyber)" stroke="#d35400" />
+                    <text x="600" y="370" text-anchor="middle" fill="white" font-size="18" font-weight="bold">CYBERSECURITY</text>
+                    <text x="600" y="395" text-anchor="middle" fill="white" font-size="14">(Enabling &amp; Protecting All Domains)</text>
+                </g>
+                
+                <!-- Level 4: Main Domains -->
+                <g class="node" id="node-logistics" data-info="Digital systems coordinating global supply chain operations">
+                    <rect x="150" y="500" width="350" height="70" rx="12" fill="url(#grad-domain)" stroke="#2980b9" />
+                    <text x="325" y="540" text-anchor="middle" fill="white" font-size="20" font-weight="bold">LOGISTICS</text>
+                </g>
+                
+                <g class="node" id="node-ports" data-info="Digital infrastructure managing port operations and security">
+                    <rect x="700" y="500" width="350" height="70" rx="12" fill="url(#grad-domain)" stroke="#2980b9" />
+                    <text x="875" y="540" text-anchor="middle" fill="white" font-size="20" font-weight="bold">PORTS MANAGEMENT</text>
+                </g>
+                
+                <!-- Level 5: Logistics Sub-domains -->
+                <g class="node" id="node-truck" data-info="Fleet management and tracking systems for truck transport">
+                    <rect x="50" y="650" width="140" height="70" rx="8" fill="url(#grad-subdomain)" stroke="#e67e22" />
+                    <text x="120" y="675" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Truck</text>
+                    <text x="120" y="695" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Transport</text>
+                </g>
+                
+                <g class="node" id="node-marine" data-info="AIS, ECDIS, and navigation systems for maritime shipping">
+                    <rect x="220" y="650" width="140" height="70" rx="8" fill="url(#grad-subdomain)" stroke="#e67e22" />
+                    <text x="290" y="675" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Marine</text>
+                    <text x="290" y="695" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Transport</text>
+                </g>
+                
+                <g class="node" id="node-container" data-info="Electronic seals and manifest tracking for container security">
+                    <rect x="390" y="650" width="140" height="70" rx="8" fill="url(#grad-subdomain)" stroke="#e67e22" />
+                    <text x="460" y="675" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Container</text>
+                    <text x="460" y="695" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Security</text>
+                </g>
+                
+                <!-- Level 6: Ports Sub-domains -->
+                <g class="node" id="node-impacts" data-info="Cascade effects from cyber attacks on port operations">
+                    <rect x="620" y="650" width="140" height="70" rx="8" fill="url(#grad-subdomain)" stroke="#e67e22" />
+                    <text x="690" y="675" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Operational</text>
+                    <text x="690" y="695" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Impacts</text>
+                </g>
+                
+                <g class="node" id="node-models" data-info="Risk-based frameworks like IMO, NIST, ISO standards">
+                    <rect x="790" y="650" width="140" height="70" rx="8" fill="url(#grad-subdomain)" stroke="#e67e22" />
+                    <text x="860" y="675" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Current</text>
+                    <text x="860" y="695" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Models</text>
+                </g>
+                
+                <g class="node" id="node-tools" data-info="SIEM, IDS systems, and SAR satellite imagery">
+                    <rect x="960" y="650" width="140" height="70" rx="8" fill="url(#grad-subdomain)" stroke="#e67e22" />
+                    <text x="1030" y="670" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Cyber Tools</text>
+                    <text x="1030" y="685" text-anchor="middle" fill="white" font-size="11" font-weight="bold">&amp; Satellite</text>
+                    <text x="1030" y="700" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Data</text>
+                </g>
+                
+                <!-- Detailed Labels -->
+                <text x="120" y="750" text-anchor="middle" fill="#7f8c8d" font-size="9">Fleet mgmt, tracking</text>
+                <text x="290" y="750" text-anchor="middle" fill="#7f8c8d" font-size="9">AIS, ECDIS, navigation</text>
+                <text x="460" y="750" text-anchor="middle" fill="#7f8c8d" font-size="9">E-seals, manifest</text>
+                <text x="690" y="750" text-anchor="middle" fill="#7f8c8d" font-size="9">Disruption cascades</text>
+                <text x="860" y="750" text-anchor="middle" fill="#7f8c8d" font-size="9">Risk-based frameworks</text>
+                <text x="1030" y="750" text-anchor="middle" fill="#7f8c8d" font-size="9">SIEM, IDS, SAR imagery</text>
+                
+                <!-- Arrows: Biosecurity to Types -->
+                <path class="arrow" d="M 550 120 L 160 180" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 580 120 L 360 180" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 600 125 L 600 180" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 620 120 L 820 180" stroke="#34495e" marker-end="url(#arrowhead)" />
+                
+                <!-- Arrows: Types to Cybersecurity -->
+                <path class="arrow" d="M 140 250 L 400 340" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 370 250 L 550 340" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 600 250 L 600 340" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 830 250 L 800 340" stroke="#34495e" marker-end="url(#arrowhead)" />
+                
+                <!-- Arrows: Cybersecurity to Domains (THICK RED) -->
+                <path class="arrow" d="M 450 420 L 300 500" stroke="#e74c3c" stroke-width="4" marker-end="url(#arrowhead-red)" />
+                <text x="360" y="460" fill="#e74c3c" font-size="11" font-weight="bold">enables</text>
+                
+                <path class="arrow" d="M 750 420 L 900 500" stroke="#e74c3c" stroke-width="4" marker-end="url(#arrowhead-red)" />
+                <text x="840" y="460" fill="#e74c3c" font-size="11" font-weight="bold">enables</text>
+                
+                <!-- Arrows: Logistics to Sub-domains -->
+                <path class="arrow" d="M 220 570 L 120 650" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 290 570 L 290 650" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 380 570 L 460 650" stroke="#34495e" marker-end="url(#arrowhead)" />
+                
+                <!-- Arrows: Ports to Sub-domains -->
+                <path class="arrow" d="M 780 570 L 690 650" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 875 570 L 860 650" stroke="#34495e" marker-end="url(#arrowhead)" />
+                <path class="arrow" d="M 970 570 L 1030 650" stroke="#34495e" marker-end="url(#arrowhead)" />
+                
+                <!-- Bidirectional Dashed Connection between Logistics and Ports -->
+                <path class="arrow arrow-dashed connection-line" d="M 500 535 L 700 535" stroke="#95a5a6" stroke-width="3" 
+                      stroke-dasharray="10,5" marker-end="url(#arrowhead)" marker-start="url(#arrowhead)" />
+            </svg>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="resetView()">🔄 Reset View</button>
+            <button class="btn btn-secondary" onclick="downloadSVG()">💾 Download SVG</button>
+            <button class="btn btn-success" onclick="exportPNG()">📸 Export as PNG</button>
+            <button class="btn btn-primary" onclick="toggleAnimation()">⚡ Toggle Animation</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item biosec">
+                <div class="legend-color" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);"></div>
+                <span><strong>Main Biosecurity</strong> - Overarching framework</span>
+            </div>
+            <div class="legend-item types">
+                <div class="legend-color" style="background: linear-gradient(135deg, #2ecc71, #27ae60);"></div>
+                <span><strong>Biosecurity Types</strong> - Specific domains</span>
+            </div>
+            <div class="legend-item cyber">
+                <div class="legend-color" style="background: linear-gradient(135deg, #e67e22, #d35400);"></div>
+                <span><strong>Cybersecurity</strong> - Central enabling layer</span>
+            </div>
+            <div class="legend-item domain">
+                <div class="legend-color" style="background: linear-gradient(135deg, #3498db, #2980b9);"></div>
+                <span><strong>Main Domains</strong> - Logistics & Ports</span>
+            </div>
+            <div class="legend-item subdomain">
+                <div class="legend-color" style="background: linear-gradient(135deg, #f39c12, #e67e22);"></div>
+                <span><strong>Sub-domains</strong> - Specific applications</span>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h3>📊 About This Framework</h3>
+            <p>
+                This interactive diagram illustrates the integrated framework of biosecurity and cybersecurity 
+                in global logistics systems. <strong>Cybersecurity</strong> plays a central role in enabling 
+                and protecting biosecurity functions across all domains, from agricultural biosecurity to 
+                laboratory biosafety. The framework emphasizes two critical domains: <strong>Logistics</strong> 
+                (including truck, marine transport, and container security) and <strong>Ports Management</strong> 
+                (covering operational impacts, current models, and cyber tools with satellite data).
+            </p>
+            <p style="margin-top: 10px;">
+                <strong>💡 Tip:</strong> Hover over any node to see detailed information. Click nodes to highlight 
+                their connections. Use the controls above to reset, download, or export the diagram.
+            </p>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Tooltip functionality
+        const tooltip = document.getElementById('tooltip');
+        const nodes = document.querySelectorAll('.node');
+
+        nodes.forEach(node => {
+            node.addEventListener('mouseenter', (e) => {
+                const info = node.getAttribute('data-info');
+                tooltip.textContent = info;
+                tooltip.classList.add('show');
+            });
+
+            node.addEventListener('mousemove', (e) => {
+                tooltip.style.left = (e.pageX + 10) + 'px';
+                tooltip.style.top = (e.pageY + 10) + 'px';
+            });
+
+            node.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('show');
+            });
+
+            // Click to highlight
+            node.addEventListener('click', () => {
+                nodes.forEach(n => n.classList.remove('highlight'));
+                node.classList.add('highlight');
+            });
+        });
+
+        // Reset view
+        function resetView() {
+            nodes.forEach(n => n.classList.remove('highlight'));
+            const svg = document.querySelector('svg');
+            svg.setAttribute('viewBox', '0 0 1200 900');
+        }
+
+        // Download SVG
+        function downloadSVG() {
+            const svg = document.querySelector('svg');
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(svg);
+            const blob = new Blob([svgString], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'biosecurity_types_framework.svg';
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Export as PNG
+        function exportPNG() {
+            const svg = document.querySelector('svg');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            canvas.width = 1200;
+            canvas.height = 900;
+            
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(svg);
+            const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+            
+            img.onload = function() {
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                
+                canvas.toBlob(function(blob) {
+                    const pngUrl = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = pngUrl;
+                    link.download = 'biosecurity_types_framework.png';
+                    link.click();
+                    URL.revokeObjectURL(pngUrl);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            img.src = url;
+        }
+
+        // Toggle animation
+        let animationEnabled = true;
+        function toggleAnimation() {
+            animationEnabled = !animationEnabled;
+            const connectionLine = document.querySelector('.connection-line');
+            if (animationEnabled) {
+                connectionLine.style.animation = 'dash 20s linear infinite';
+            } else {
+                connectionLine.style.animation = 'none';
+            }
+        }
+
+        // Add fade-in animation on page load
+        window.addEventListener('load', () => {
+            nodes.forEach((node, index) => {
+                setTimeout(() => {
+                    node.style.opacity = '0';
+                    node.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        node.style.opacity = '1';
+                    }, 50);
+                }, index * 100);
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'r' || e.key === 'R') {
+                resetView();
+            } else if (e.key === 'd' || e.key === 'D') {
+                downloadSVG();
+            } else if (e.key === 'p' || e.key === 'P') {
+                exportPNG();
+            }
+        });
+
+        // Console Easter Egg
+        console.log('%c🛡️ Biosecurity Framework', 'font-size: 20px; font-weight: bold; color: #9b59b6;');
+        console.log('%cKeyboard Shortcuts:', 'font-size: 14px; font-weight: bold; color: #34495e;');
+        console.log('%c  R - Reset View', 'font-size: 12px; color: #27ae60;');
+        console.log('%c  D - Download SVG', 'font-size: 12px; color: #e67e22;');
+        console.log('%c  P - Export PNG', 'font-size: 12px; color: #3498db;');
+    </script>
+</body>
+</html>
