@@ -44,7 +44,7 @@ Dijkstra's algorithm \citep{Dijkstra1959} extends shortest path computation to g
 
 The correctness of Dijkstra's algorithm relies on the non-negativity of edge weights, which ensures that once a vertex is extracted from the priority queue, its shortest path distance has been determined \citep{Cormen2009}. The time complexity depends on the priority queue implementation: $O(|V|^2)$ with a simple array, $O((|V| + |E|) \log |V|)$ with a binary heap, and $O(|V| \log |V| + |E|)$ with a Fibonacci heap \citep{Fredman1987}.
 
-For grid-based pathfinding, Dijkstra's algorithm supports heterogeneous traversal costs, enabling cost maps where different terrain types impose different movement penalties. This capability is essential for risk-aware pathfinding where exposure costs must be accumulated along paths.
+For grid-based pathfinding, Dijkstra's algorithm supports varied traversal costs, enabling cost maps where different terrain types impose different movement penalties. This capability is essential for risk-aware pathfinding where exposure costs must be accumulated along paths.
 
 \subsection{Bellman-Ford Algorithm}
 
@@ -157,7 +157,7 @@ The anytime property is particularly valuable for autonomous systems operating u
 
 \section{Grid-Based Pathfinding Techniques}
 
-Grid maps represent environments as regular tessellations of cells, with each cell classified as traversable or blocked. This representation is widely used in robotics, video games, and geographic information systems due to its simplicity and compatibility with raster data sources such as satellite imagery and occupancy grids from sensors.
+Grid maps represent environments as regular patterns of cells, with each cell classified as traversable or blocked. This representation is widely used in robotics, video games, and geographic information systems due to its simplicity and compatibility with raster data sources such as satellite imagery and occupancy grids from sensors.
 
 \subsection{Grid Representations and Connectivity}
 
@@ -260,7 +260,7 @@ AD* can quickly produce a suboptimal solution when changes are detected, then im
 
 \subsection{Field D*}
 
-Field D* \citep{Ferguson2006} extends D* Lite to produce any-angle paths by interpolating costs across cell boundaries. Rather than restricting paths to grid edges, Field D* allows the robot to cut corners and take direct paths when beneficial.
+Field D* \citep{Ferguson2006} extends D* Lite to produce any-angle paths by smoothly blending costs across cell boundaries. Rather than restricting paths to grid edges, Field D* allows the robot to cut corners and take direct paths when beneficial.
 
 The interpolation approach provides smooth paths suitable for execution by physical robots while maintaining the incremental update capabilities of D* Lite. Field D* has been successfully deployed on Mars rovers for autonomous navigation.
 

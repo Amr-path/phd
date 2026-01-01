@@ -114,6 +114,14 @@ tocpage,  % Put ``Page'' at top of ToC. Add lotpage, lofpage if
 \usepackage{algorithm}
 \usepackage{indentfirst}
 
+%% For theorem environments
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+
 %% Enter particulars about your thesis HERE
 % Your Name
 \author{ELSHAHED AMR MOUSTAFA MOHAMED ALY ELSAYED}
@@ -175,9 +183,9 @@ bookmarksdepth=section,breaklinks=true]{hyperref}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% MAKE SURE YOU HAVE A acknowledgements.tex FILE
+% MAKE SURE YOU HAVE A acknowledgement.tex FILE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\include{acknowledgements}
+\include{acknowledgement}
 
 \tableofcontents \clearpage
 \listoftables \clearpage
@@ -261,9 +269,10 @@ bookmarksdepth=section,breaklinks=true]{hyperref}
 % The list of own publications.  If you don't have one, you may
 % comment out the next 4 lines.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Uncomment/comment this line if you need the List of Publications to be bold/not bold in the ToC.
-\addtocontents{toc}{\protect\renewcommand\protect\cftchapfont{\protect\bfseries}}
-\nociteown{lim:2007,lim:latextypesetting}
-\bibliographyown{mybib}
+%% NOTE: Uncomment and add your own publications to mybib.bib when ready
+%% Then add \nociteown{yourkey1,yourkey2} with your publication keys
+% \addtocontents{toc}{\protect\renewcommand\protect\cftchapfont{\protect\bfseries}}
+% \nociteown{yourpublication1,yourpublication2}
+% \bibliographyown{mybib}
 
 \end{document}
