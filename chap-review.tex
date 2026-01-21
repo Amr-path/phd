@@ -17,9 +17,9 @@ The logistical complexity of port operations further shapes pathfinding requirem
 
 \subsection{Map Models: Occupancy Grids and Cost Maps}
 
-Grid-based representations have emerged as the dominant paradigm for encoding navigable environments in autonomous systems due to their computational tractability and compatibility with sensor data \citep{Latombe1991, Thrun2006}. Occupancy grids partition continuous space into discrete cells, with each cell assigned a binary traversability status or a continuous occupancy probability. This representation enables efficient spatial reasoning by reducing geometric computations to array operations, while providing a natural interface for integrating measurements from range sensors, cameras, and other perception modalities.
+Grid-based representations have emerged as the dominant paradigm for encoding navigable environments in autonomous systems due to their computational tractability and compatibility with sensor data \citep{Aggarwal2020, Radmanesh2018}. Occupancy grids partition continuous space into discrete cells, with each cell assigned a binary traversability status or a continuous occupancy probability. This representation enables efficient spatial reasoning by reducing geometric computations to array operations, while providing a natural interface for integrating measurements from range sensors, cameras, and other perception modalities.
 
-The resolution of grid representations involves fundamental tradeoffs between precision and computational cost. Fine-grained grids with small cell dimensions capture environmental detail with high fidelity but expand the state space quadratically with resolution, increasing both memory requirements and search complexity \citep{Sturtevant2012}. Coarse grids reduce computational burden but may fail to represent narrow passages or small obstacles accurately, potentially rendering feasible paths unreachable or permitting paths through regions that should be blocked. For port environments where drone operations require meter-scale precision for obstacle avoidance, grid resolutions in the range of 0.5 to 2 meters per cell typically provide acceptable accuracy while maintaining tractable state space sizes for environments spanning hundreds of meters.
+The resolution of grid representations involves fundamental tradeoffs between precision and computational cost. Fine-grained grids with small cell dimensions capture environmental detail with high fidelity but expand the state space quadratically with resolution, increasing both memory requirements and search complexity \citep{Sturtevant2022, Sturtevant2012}. Coarse grids reduce computational burden but may fail to represent narrow passages or small obstacles accurately, potentially rendering feasible paths unreachable or permitting paths through regions that should be blocked. For port environments where drone operations require meter-scale precision for obstacle avoidance, grid resolutions in the range of 0.5 to 2 meters per cell typically provide acceptable accuracy while maintaining tractable state space sizes for environments spanning hundreds of meters.
 
 Cost maps extend binary occupancy grids by assigning traversal costs to each cell, enabling representation of heterogeneous terrain and risk factors. In the context of port drone operations, cell costs may encode multiple factors including distance from obstacles (safety margins), proximity to restricted zones, altitude-dependent wind exposure, and operational risk assessments \citep{Feyzabadi2014, Majumdar2017}. The composite cost function employed in this thesis combines distance with weighted risk: $\text{cost} = \text{distance} + \lambda \sum \text{risk}$, where $\lambda$ is a user-specified parameter balancing efficiency against exposure minimization. This formulation enables flexible adaptation to mission requirements ranging from time-critical operations (low $\lambda$) to safety-prioritized missions (high $\lambda$).
 
@@ -27,9 +27,9 @@ Hierarchical and multi-resolution representations address scalability limitation
 
 \subsection{Sensing and Dynamic Map Updates}
 
-Autonomous drone systems operating in port environments rely on multiple sensing modalities to perceive obstacles and update environmental representations. Onboard sensors including cameras, LiDAR, and radar provide local perception within the drone's immediate vicinity, while infrastructure-based sensors and operational data feeds supply information about activities throughout the terminal \citep{Thrun2006, Goerzen2010}. The integration of these heterogeneous data sources into coherent map representations presents significant technical challenges, particularly regarding temporal alignment and uncertainty quantification.
+Autonomous drone systems operating in port environments rely on multiple sensing modalities to perceive obstacles and update environmental representations. Onboard sensors including cameras, LiDAR, and radar provide local perception within the drone's immediate vicinity, while infrastructure-based sensors and operational data feeds supply information about activities throughout the terminal \citep{Aggarwal2020, Radmanesh2018}. The integration of these heterogeneous data sources into coherent map representations presents significant technical challenges, particularly regarding temporal alignment and uncertainty quantification.
 
-The frequency and spatial extent of map updates fundamentally influence pathfinding algorithm requirements. Localized updates affecting small numbers of cells can often be accommodated through incremental replanning techniques that repair existing solutions rather than recomputing from scratch \citep{Koenig2002, Koenig2004}. Widespread changes affecting large portions of the map may necessitate complete replanning, negating the computational advantages of incremental approaches. Port environments exhibit both update patterns: individual equipment movements create localized changes, while shift changes or vessel operations may trigger broader reconfigurations. The adaptive corridor mechanism developed in this thesis specifically addresses the challenge of maintaining computational efficiency across this spectrum of update scales.
+The frequency and spatial extent of map updates fundamentally influence pathfinding algorithm requirements. Localized updates affecting small numbers of cells can often be accommodated through incremental replanning techniques that repair existing solutions rather than recomputing from scratch \citep{Koenig2002, Aine2016}. Widespread changes affecting large portions of the map may necessitate complete replanning, negating the computational advantages of incremental approaches. Port environments exhibit both update patterns: individual equipment movements create localized changes, while shift changes or vessel operations may trigger broader reconfigurations. The adaptive corridor mechanism developed in this thesis specifically addresses the challenge of maintaining computational efficiency across this spectrum of update scales.
 
 Uncertainty in obstacle detection and map updates introduces additional considerations for pathfinding reliability. Sensor noise, occlusion, and processing latencies can produce map representations that imperfectly reflect true environmental conditions \citep{Thrun2006}. Conservative approaches inflate obstacles to provide safety margins, while probabilistic methods maintain belief distributions over occupancy states. For the risk-aware pathfinding framework developed in this thesis, uncertainty is addressed through the risk layer of cost maps, which can encode confidence levels or hazard probabilities distinct from binary obstacle status. This separation enables the planning algorithm to reason about exposure risks while maintaining clear obstacle boundaries for collision avoidance.
 
@@ -43,11 +43,11 @@ Table~\ref{tab:environment_benchmarks} summarizes representative datasets, simul
 \hline
 \textbf{Resource} & \textbf{Environment Type} & \textbf{Dynamic Support} & \textbf{Risk Layers} & \textbf{Limitation} \\
 \hline
-Moving AI Benchmarks \citep{MovingAI} & Game maps, mazes, rooms & Static only & No & No port-specific maps \\
+Moving AI Benchmarks \citep{Sturtevant2022} & Game maps, mazes, rooms & Static only & No & No port-specific maps \\
 \hline
 ArduPilot SITL \citep{ArduPilot2024} & Configurable 3D & Yes & Limited & Requires custom map setup \\
 \hline
-Gazebo Simulator \citep{Koenig2004Gazebo} & General robotics & Yes & Via plugins & Complex configuration \\
+Gazebo Sim \citep{GazeboSim2024} & General robotics & Yes & Via plugins & Complex configuration \\
 \hline
 AirSim \citep{Shah2018} & Urban, indoor & Yes & Limited & High compute requirements \\
 \hline
@@ -56,7 +56,7 @@ Custom port grids (this thesis) & Port terminals & Yes & Yes & Limited to 2D abs
 \end{tabular}
 \end{table}
 
-The scarcity of standardized benchmarks for port-like environments with dynamic obstacles and risk annotations represents a methodological gap that complicates reproducible evaluation of pathfinding algorithms. The Moving AI benchmarks, while comprehensive for static grid pathfinding, do not capture the temporal dynamics essential to port operations \citep{MovingAI, Sturtevant2012}. Simulation platforms such as ArduPilot SITL and Gazebo provide dynamic environment support but require substantial configuration effort to represent port-specific scenarios \citep{ArduPilot2024, Koenig2004Gazebo}. The evaluation framework developed in this thesis addresses this gap through systematic generation of port-representative grid scenarios with controlled obstacle densities, symmetry characteristics, and dynamic update patterns.
+The scarcity of standardized benchmarks for port-like environments with dynamic obstacles and risk annotations represents a methodological gap that complicates reproducible evaluation of pathfinding algorithms. The Moving AI benchmarks, while comprehensive for static grid pathfinding, do not capture the temporal dynamics essential to port operations \citep{Sturtevant2022, Sturtevant2012}. Simulation platforms such as ArduPilot SITL and Gazebo Sim provide dynamic environment support but require substantial configuration effort to represent port-specific scenarios \citep{ArduPilot2024, GazeboSim2024}. The evaluation framework developed in this thesis addresses this gap through systematic generation of port-representative grid scenarios with controlled obstacle densities, symmetry characteristics, and dynamic update patterns.
 
 
 \section{Heterogeneity and Dynamics in Pathfinding}\label{sec:heterogeneity}
@@ -67,11 +67,11 @@ Real-world pathfinding problems exhibit heterogeneity across multiple dimensions
 
 Port environments exhibit pronounced spatial heterogeneity stemming from the functional differentiation of terminal zones and the geometric complexity of container storage configurations. Container yards feature dense obstacle configurations where stacked containers create canyon-like corridors with limited lateral connectivity \citep{Notteboom2024}. Quayside areas present different characteristics, with large open spaces punctuated by crane structures and berthed vessels. Administrative zones contain buildings and infrastructure with irregular footprints. This spatial diversity implies that pathfinding algorithms must accommodate varying obstacle densities and connectivity patterns within a single operational environment.
 
-The distribution of obstacles significantly impacts search algorithm performance. In sparse environments with widely dispersed obstacles, heuristic search algorithms efficiently guide exploration toward the goal, with the heuristic providing accurate estimates of remaining cost \citep{Hart1968, Pearl1984}. Dense environments with high obstacle concentrations degrade heuristic effectiveness, as direct paths are frequently blocked and actual costs substantially exceed heuristic estimates. Cluttered environments with narrow passages present particular challenges, as search algorithms must explore numerous dead ends before discovering viable paths through constrained corridors \citep{Sturtevant2012}.
+The distribution of obstacles significantly impacts search algorithm performance. In sparse environments with widely dispersed obstacles, heuristic search algorithms efficiently guide exploration toward the goal, with the heuristic providing accurate estimates of remaining cost \citep{Russell2021, Felner2022}. Dense environments with high obstacle concentrations degrade heuristic effectiveness, as direct paths are frequently blocked and actual costs substantially exceed heuristic estimates. Cluttered environments with narrow passages present particular challenges, as search algorithms must explore numerous dead ends before discovering viable paths through constrained corridors \citep{Strasser2022, Sturtevant2022}.
 
 Container stacking configurations in port yards create structured obstacle patterns that differ qualitatively from random obstacle distributions. Containers are arranged in standardized blocks with regular spacing, creating parallel corridors oriented along primary axes. This structural regularity introduces symmetry properties that classical algorithms fail to exploit, instead treating symmetric regions as independent states requiring separate exploration. The potential for symmetry exploitation in such structured environments motivates the Folding A* algorithm developed in this thesis, which achieves state-space reductions by recognizing and collapsing equivalent regions.
 
-Narrow passages and chokepoints require special attention in grid-based pathfinding. When feasible paths must traverse constrained corridors, search algorithms may expand large numbers of nodes in unsuccessful exploration of blocked alternatives before discovering the viable route. Jump Point Search addresses this challenge for uniform-cost grids through aggressive pruning of intermediate nodes \citep{Harabor2011}, but its restriction to uniform costs precludes application to risk-weighted grids. The corridor-constrained approach of Incremental Line Search offers an alternative strategy, focusing exploration along the direct path and widening only when obstructions necessitate detours.
+Narrow passages and chokepoints require special attention in grid-based pathfinding. When feasible paths must traverse constrained corridors, search algorithms may expand large numbers of nodes in unsuccessful exploration of blocked alternatives before discovering the viable route. Jump Point Search addresses this challenge for uniform-cost grids through aggressive pruning of intermediate nodes \citep{Harabor2014}, but its restriction to uniform costs precludes application to risk-weighted grids. The corridor-constrained approach of Incremental Line Search offers an alternative strategy, focusing exploration along the direct path and widening only when obstructions necessitate detours.
 
 \subsection{Temporal Variability}
 
@@ -102,7 +102,7 @@ Classical graph search algorithms provide the theoretical foundation for grid-ba
 
 The A* algorithm, introduced by \citet{Hart1968} with subsequent refinements by \citet{Hart1972}, remains the most widely employed heuristic search algorithm for grid-based pathfinding. A* combines the accumulated cost from the start node, denoted $g(n)$, with a heuristic estimate of remaining cost to the goal, denoted $h(n)$, prioritizing expansion of nodes with minimum total estimate $f(n) = g(n) + h(n)$. This best-first strategy focuses search toward promising regions while maintaining optimality guarantees when the heuristic satisfies admissibility conditions.
 
-The theoretical properties of A* depend critically on heuristic characteristics. A heuristic function is admissible if it never overestimates the true cost to reach the goal: $h(n) \leq h^*(n)$ for all nodes $n$, where $h^*(n)$ denotes the actual optimal cost. A stronger property, consistency (or monotonicity), requires that for every node $n$ and successor $n'$, the heuristic satisfies $h(n) \leq c(n, n') + h(n')$, where $c(n, n')$ is the edge cost. Consistent heuristics are necessarily admissible, though the converse does not hold in general \citep{Dechter1985, Felner2011}.
+The theoretical properties of A* depend critically on heuristic characteristics. A heuristic function is admissible if it never overestimates the true cost to reach the goal: $h(n) \leq h^*(n)$ for all nodes $n$, where $h^*(n)$ denotes the actual optimal cost. A stronger property, consistency (or monotonicity), requires that for every node $n$ and successor $n'$, the heuristic satisfies $h(n) \leq c(n, n') + h(n')$, where $c(n, n')$ is the edge cost. Consistent heuristics are necessarily admissible, though the converse does not hold in general \citep{Russell2021, Felner2011}.
 
 \begin{theorem}[Optimality of A*, \citet{Hart1968}]
 If the heuristic function $h$ is admissible, then A* returns an optimal solution if one exists.
@@ -112,7 +112,7 @@ If the heuristic function $h$ is admissible, then A* returns an optimal solution
 Among all algorithms that use the same heuristic information and expand nodes in best-first order, A* expands the minimum number of nodes necessary to guarantee optimality.
 \end{theorem}
 
-For grid-based pathfinding, commonly employed heuristics include the Manhattan distance for 4-connected grids, the Euclidean distance, and the octile distance for 8-connected grids. The Manhattan distance $h(n) = |x_n - x_g| + |y_n - y_g|$ is admissible for 4-connected uniform-cost grids but inadmissible for 8-connected grids where diagonal movements provide shortcuts. The octile distance $h(n) = \max(|dx|, |dy|) + (\sqrt{2} - 1)\min(|dx|, |dy|)$ provides the tightest admissible heuristic for 8-connected uniform-cost grids, minimizing the gap between estimated and actual costs \citep{Sturtevant2012}.
+For grid-based pathfinding, commonly employed heuristics include the Manhattan distance for 4-connected grids, the Euclidean distance, and the octile distance for 8-connected grids. The Manhattan distance $h(n) = |x_n - x_g| + |y_n - y_g|$ is admissible for 4-connected uniform-cost grids but inadmissible for 8-connected grids where diagonal movements provide shortcuts. The octile distance $h(n) = \max(|dx|, |dy|) + (\sqrt{2} - 1)\min(|dx|, |dy|)$ provides the tightest admissible heuristic for 8-connected uniform-cost grids, minimizing the gap between estimated and actual costs \citep{Sturtevant2022, Sturtevant2012}.
 
 The effectiveness of A* degrades when heuristics poorly approximate actual costs, a situation that arises frequently in cluttered environments where direct paths are blocked by obstacles. When obstacles force detours, the actual path length substantially exceeds the straight-line heuristic estimate, causing A* to expand many nodes before discovering that apparently promising directions are blocked. This degradation motivates the development of more informed heuristics, hierarchical approaches, and the corridor-constrained search strategy employed by Incremental Line Search.
 
@@ -128,7 +128,7 @@ The relationship between these algorithms illuminates fundamental tradeoffs in s
 
 \subsection{Heuristic Design and Complexity Considerations}
 
-The design of effective heuristics for grid-based pathfinding involves balancing informativeness against computational cost. More accurate heuristics reduce node expansions by better estimating actual path costs, but complex heuristic calculations may offset these savings if evaluation overhead is substantial. The $O(1)$ computation of geometric distance heuristics makes them practical for real-time applications, while more sophisticated approaches such as pattern databases or true-distance lookups require preprocessing that may be infeasible for dynamic environments \citep{Korf1997, Goldenberg2010}.
+The design of effective heuristics for grid-based pathfinding involves balancing informativeness against computational cost. More accurate heuristics reduce node expansions by better estimating actual path costs, but complex heuristic calculations may offset these savings if evaluation overhead is substantial. The $O(1)$ computation of geometric distance heuristics makes them practical for real-time applications, while more sophisticated approaches such as pattern databases or true-distance lookups require preprocessing that may be infeasible for dynamic environments \citep{Strasser2022, Uras2023}.
 
 Tie-breaking strategies influence A* performance when multiple nodes share the same $f$-value. Breaking ties in favor of nodes with higher $g$-values (and correspondingly lower $h$-values) tends to expand nodes closer to the goal, potentially finding solutions faster. Breaking ties in favor of lower $g$-values explores more broadly, which may be advantageous when the heuristic is misleading. The choice of tie-breaking strategy interacts with heuristic quality and environment characteristics in complex ways that complicate general recommendations \citep{Holte2010}.
 
@@ -142,20 +142,20 @@ Table~\ref{tab:classical_methods} provides a comparative summary of classical se
 \hline
 \textbf{Algorithm} & \textbf{Assumptions} & \textbf{Strengths} & \textbf{Complexity} & \textbf{Limitations} \\
 \hline
-BFS \citep{Moore1959} & Unweighted edges & Simple, optimal for unit costs & $O(|V| + |E|)$ & Cannot handle weighted costs \\
+BFS \citep{Cormen2009} & Unweighted edges & Simple, optimal for unit costs & $O(|V| + |E|)$ & Cannot handle weighted costs \\
 \hline
-Dijkstra \citep{Dijkstra1959} & Non-negative weights & Optimal, no heuristic needed & $O((|V|+|E|)\log|V|)$ & Explores uniformly; slow on large grids \\
+Dijkstra \citep{Cormen2009} & Non-negative weights & Optimal, no heuristic needed & $O((|V|+|E|)\log|V|)$ & Explores uniformly; slow on large grids \\
 \hline
-A* \citep{Hart1968} & Admissible heuristic & Optimal, focused search & $O(b^d)$ worst case & Degrades with poor heuristics \\
+A* \citep{Russell2021} & Admissible heuristic & Optimal, focused search & $O(b^d)$ worst case & Degrades with poor heuristics \\
 \hline
-Weighted A* \citep{Pohl1970} & Admissible heuristic & Faster than A*, bounded suboptimality & Typically $< A*$ & Solutions may be suboptimal \\
+Weighted A* \citep{Wilt2012} & Admissible heuristic & Faster than A*, bounded suboptimality & Typically $< A*$ & Solutions may be suboptimal \\
 \hline
-IDA* \citep{Korf1985} & Admissible heuristic & Linear space & Repeated expansions & Slow on grids due to re-expansion \\
+Theta* \citep{Daniel2010} & Admissible heuristic & Any-angle paths & Similar to A* & Line-of-sight checks \\
 \hline
 \end{tabular}
 \end{table}
 
-The table reveals that classical methods face inherent tradeoffs between optimality guarantees, computational efficiency, and memory requirements. A* provides the strongest combination of optimality and efficiency when heuristics are informative, but its performance degrades in cluttered environments where heuristics become uninformative. Weighted A* offers a practical compromise, trading bounded suboptimality for reduced computation \citep{Pohl1970, Wilt2012}. These observations motivate the corridor-constrained approach of Incremental Line Search, which restricts search to promising regions without sacrificing optimality guarantees within the constrained space.
+The table reveals that classical methods face inherent tradeoffs between optimality guarantees, computational efficiency, and memory requirements. A* provides the strongest combination of optimality and efficiency when heuristics are informative, but its performance degrades in cluttered environments where heuristics become uninformative. Weighted A* offers a practical compromise, trading bounded suboptimality for reduced computation \citep{Wilt2012, Felner2022}. These observations motivate the corridor-constrained approach of Incremental Line Search, which restricts search to promising regions without sacrificing optimality guarantees within the constrained space.
 
 
 \section{Incremental and Real-Time Replanning Methods}\label{sec:incremental_replanning}
@@ -188,7 +188,7 @@ The ILS approach differs philosophically from D* Lite and LPA* in its treatment 
 
 The responsiveness of replanning algorithms to dynamic obstacles depends on both computational efficiency and detection latency. Even a computationally efficient replanning algorithm provides limited benefit if obstacle detection delays cause the drone to approach obstacles before updated paths are available. Effective dynamic obstacle handling therefore requires integration of perception, planning, and control systems with appropriate timing relationships.
 
-Anytime algorithms provide an alternative approach to achieving responsiveness under time constraints. ARA* (Anytime Repairing A*) \citep{Likhachev2003} produces an initial suboptimal solution quickly, then progressively improves solution quality as computation time permits. Anytime D* \citep{Likhachev2005, Likhachev2008} combines the anytime property with incremental replanning, enabling rapid response to environmental changes while improving solutions when time is available. These algorithms are particularly valuable for autonomous systems where strict deadlines constrain planning time and suboptimal but feasible solutions are preferable to delayed optimal solutions.
+Anytime algorithms provide an alternative approach to achieving responsiveness under time constraints. ARA* (Anytime Repairing A*) \citep{Likhachev2003} produces an initial suboptimal solution quickly, then progressively improves solution quality as computation time permits. Anytime D* \citep{Likhachev2008} combines the anytime property with incremental replanning, enabling rapid response to environmental changes while improving solutions when time is available. Recent work on truncated incremental search \citep{Aine2016} provides additional mechanisms for bounding computational effort while maintaining solution quality. These algorithms are particularly valuable for autonomous systems where strict deadlines constrain planning time and suboptimal but feasible solutions are preferable to delayed optimal solutions.
 
 Table~\ref{tab:replanning_methods} summarizes incremental and real-time replanning methods, comparing their update mechanisms, complexity characteristics, and suitability for different application scenarios.
 
@@ -200,11 +200,11 @@ Table~\ref{tab:replanning_methods} summarizes incremental and real-time replanni
 \hline
 \textbf{Method} & \textbf{Update Mechanism} & \textbf{Update Complexity} & \textbf{Optimality} & \textbf{Best Suited For} \\
 \hline
-D* \citep{Stentz1994} & Backward cost propagation & $O(k \log k)$ for $k$ affected nodes & Optimal & Unknown environments \\
-\hline
 D* Lite \citep{Koenig2002} & Consistency repair & $O(k \log k)$ & Optimal & Moving robot with discoveries \\
 \hline
 LPA* \citep{Koenig2004} & Inconsistency resolution & $O(k \log k)$ & Optimal & Fixed start, changing costs \\
+\hline
+Truncated IS \citep{Aine2016} & Bounded propagation & Bounded & $\epsilon$-optimal & Large state spaces \\
 \hline
 ARA* \citep{Likhachev2003} & Weight reduction & Bounded suboptimal & $\epsilon$-optimal & Time-critical planning \\
 \hline
@@ -226,7 +226,7 @@ Grid-based pathfinding often involves substantial redundant computation when alg
 
 Classical search algorithms treat each grid cell as an independent state, expanding and evaluating nodes without recognizing structural relationships among them. This approach results in redundant computation when multiple cells or regions are functionally equivalent---that is, when they admit identical path possibilities modulo transformation. In uniformly weighted grids, a path from $A$ to $B$ through region $R$ has the same cost as the transformed path through any symmetrically equivalent region $R'$, yet classical algorithms explore both possibilities independently.
 
-Path symmetry, identified by \citet{Harabor2010}, refers to multiple paths between two points that traverse the same cells in different orders. On uniform-cost grids, many orderings yield identical costs, and A* may explore numerous equivalent paths before finding the goal. Jump Point Search \citep{Harabor2011} addresses path symmetry by identifying canonical orderings and skipping intermediate nodes that cannot improve upon the canonical path. The dramatic speedups achieved by JPS---often exceeding an order of magnitude---demonstrate the computational significance of symmetry exploitation.
+Path symmetry, identified by \citet{Harabor2010}, refers to multiple paths between two points that traverse the same cells in different orders. On uniform-cost grids, many orderings yield identical costs, and A* may explore numerous equivalent paths before finding the goal. Jump Point Search \citep{Harabor2014} addresses path symmetry by identifying canonical orderings and skipping intermediate nodes that cannot improve upon the canonical path. The dramatic speedups achieved by JPS---often exceeding an order of magnitude---demonstrate the computational significance of symmetry exploitation.
 
 Geometric symmetry represents a distinct form of structural regularity where the grid itself exhibits reflection or rotation invariance. Many practical environments, including warehouses with parallel aisles, greenhouses with symmetric row configurations, and ports with regular container block layouts, exhibit approximate or exact horizontal symmetry. Unlike path symmetry, which concerns alternative orderings of the same cell sequence, geometric symmetry relates cells in one region to corresponding cells in another, potentially enabling more aggressive state-space compression.
 
@@ -260,20 +260,20 @@ Table~\ref{tab:symmetry_methods} summarizes symmetry exploitation and search-spa
 \hline
 \textbf{Technique} & \textbf{Symmetry Type} & \textbf{Mechanism} & \textbf{Speedup} & \textbf{Requirements} \\
 \hline
-JPS \citep{Harabor2011} & Path symmetry & Canonical orderings, jump points & 10-50x & Uniform costs, 8-connected \\
+JPS \citep{Harabor2014} & Path symmetry & Canonical orderings, jump points & 10-50x & Uniform costs, 8-connected \\
 \hline
 Rectangular symmetry \citep{Harabor2010} & Path symmetry & Forced traversal order & 2-5x & Uniform costs \\
 \hline
-Planning symmetry \citep{Fox1999} & State equivalence & Symmetry group pruning & Variable & Detectable symmetry group \\
+Symmetry pruning \citep{Bono2019} & State equivalence & Symmetry group pruning & Variable & Detectable symmetry group \\
 \hline
 Folding A* (this thesis) & Geometric (horizontal) & Coordinate folding & 1.8-2.2x & Symmetric grid layout \\
 \hline
-Hierarchical \citep{Botea2004} & Spatial decomposition & Multi-level abstraction & 5-20x & Preprocessing, memory \\
+Subgoal graphs \citep{Strasser2022} & Spatial decomposition & Multi-level abstraction & 5-20x & Preprocessing, memory \\
 \hline
 \end{tabular}
 \end{table}
 
-The table reveals distinct tradeoffs among symmetry exploitation approaches. Jump Point Search achieves dramatic speedups but requires uniform costs, precluding application to risk-weighted grids essential for port drone navigation. Hierarchical methods provide substantial acceleration but require preprocessing that may be invalidated by dynamic changes. Folding A* offers more modest but guaranteed speedups on symmetric grids while supporting weighted costs and dynamic environments. This combination of characteristics makes Folding A* particularly suitable for structured port environments where geometric symmetry is prevalent and cost-weighted planning is required.
+The table reveals distinct tradeoffs among symmetry exploitation approaches. Jump Point Search achieves dramatic speedups but requires uniform costs, precluding application to risk-weighted grids essential for port drone navigation. Subgoal-based methods \citep{Strasser2022, Uras2023} provide substantial acceleration but require preprocessing that may be invalidated by dynamic changes. Recent work on symmetry pruning in multi-agent settings \citep{Bono2019} demonstrates the continued relevance of symmetry exploitation. Folding A* offers more modest but guaranteed speedups on symmetric grids while supporting weighted costs and dynamic environments. This combination of characteristics makes Folding A* particularly suitable for structured port environments where geometric symmetry is prevalent and cost-weighted planning is required.
 
 
 \section{Learning-Based and Hybrid Planning}\label{sec:learning_hybrid}
@@ -325,7 +325,7 @@ The relative importance of different metrics depends on application requirements
 
 \subsection{Benchmarks and Reproducibility}
 
-Reproducible evaluation requires standardized benchmarks enabling fair comparison across algorithms and studies. The Moving AI benchmarks \citep{MovingAI, Sturtevant2012} provide the most widely used grid pathfinding test sets, including game maps, random obstacle configurations, and room-corridor environments. However, these benchmarks focus on static environments and do not include risk annotations or dynamic updates characteristic of port drone applications.
+Reproducible evaluation requires standardized benchmarks enabling fair comparison across algorithms and studies. The Moving AI benchmarks \citep{Sturtevant2022, Sturtevant2012} provide the most widely used grid pathfinding test sets, including game maps, random obstacle configurations, and room-corridor environments. The Grid-Based Path Planning Competition \citep{Sturtevant2020GPPC} provides ongoing evaluation of state-of-the-art algorithms. However, these benchmarks focus on static environments and do not include risk annotations or dynamic updates characteristic of port drone applications.
 
 Reproducibility requires not only standardized test environments but also consistent experimental methodology. Hardware specifications, implementation languages, compiler optimizations, and measurement procedures all affect reported results. Best practices include reporting hardware configurations, using consistent timing methodology, averaging across multiple runs to account for variability, and providing statistical measures of uncertainty.
 
@@ -340,7 +340,7 @@ The review of prior studies highlights substantial progress in grid-based pathfi
 
 While hierarchical methods and precomputation approaches accelerate pathfinding through spatial decomposition, they require preprocessing that may be invalidated by dynamic changes or memory resources that constrain deployment on embedded platforms. Corridor-based search that constrains exploration to promising regions along the direct path has received limited systematic investigation.
 
-\textit{Gap 1: Absence of Corridor-Constrained Methods for Weighted Grids.} Jump Point Search achieves dramatic speedups through aggressive pruning but requires uniform edge costs, precluding application to risk-annotated grids essential for port drone navigation. No existing method provides JPS-like corridor focusing while supporting heterogeneous costs. The Incremental Line Search framework developed in this thesis addresses this gap through a corridor construction approach compatible with arbitrary cost functions.
+\textit{Gap 1: Absence of Corridor-Constrained Methods for Weighted Grids.} Jump Point Search \citep{Harabor2014} achieves dramatic speedups through aggressive pruning but requires uniform edge costs, precluding application to risk-annotated grids essential for port drone navigation. Recent advances in subgoal-based methods \citep{Strasser2022, Uras2023} similarly focus on uniform-cost grids. No existing method provides JPS-like corridor focusing while supporting heterogeneous costs. The Incremental Line Search framework developed in this thesis addresses this gap through a corridor construction approach compatible with arbitrary cost functions.
 
 \textit{Gap 2: Limited Adaptive Mechanisms for Dynamic Environments.} Existing corridor or bounded search methods typically employ fixed bounds that may be inappropriate when environmental conditions change. Obstacles appearing within narrow corridors can render paths infeasible, while conservative wide corridors sacrifice computational benefits. The adaptive corridor widening mechanism developed in this thesis enables dynamic adjustment based on local conditions.
 
@@ -413,9 +413,9 @@ The following key insights emerge from this review:
 
 \item \textbf{Classical search algorithms provide strong foundations but face scalability limitations.} A* with admissible heuristics guarantees optimal solutions but may expand excessive nodes in cluttered environments where heuristics poorly approximate actual costs. Uninformed algorithms like Dijkstra's algorithm explore uniformly regardless of goal location, wasting computation on irrelevant regions.
 
-\item \textbf{Incremental replanning addresses dynamic environments but does not inherently reduce initial computation.} Algorithms such as D* Lite and LPA* efficiently update solutions when environments change but still require potentially expensive initial search. Combining incremental update capabilities with mechanisms for reducing initial computation remains an open opportunity.
+\item \textbf{Incremental replanning addresses dynamic environments but does not inherently reduce initial computation.} Algorithms such as D* Lite \citep{Koenig2002} and LPA* \citep{Koenig2004}, along with recent advances like truncated incremental search \citep{Aine2016}, efficiently update solutions when environments change but still require potentially expensive initial search. Combining incremental update capabilities with mechanisms for reducing initial computation remains an open opportunity.
 
-\item \textbf{Symmetry exploitation achieves dramatic speedups but existing methods have restrictive requirements.} Jump Point Search demonstrates order-of-magnitude acceleration through path symmetry exploitation but requires uniform costs incompatible with risk-weighted planning. Geometric symmetry in structured environments remains largely unexploited by current pathfinding algorithms.
+\item \textbf{Symmetry exploitation achieves dramatic speedups but existing methods have restrictive requirements.} Jump Point Search \citep{Harabor2014} and subgoal-based approaches \citep{Strasser2022} demonstrate order-of-magnitude acceleration through path symmetry exploitation but require uniform costs incompatible with risk-weighted planning. Geometric symmetry in structured environments remains largely unexploited by current pathfinding algorithms.
 
 \item \textbf{Significant gaps persist between algorithmic research and practical deployment.} The absence of validated planning-to-execution pipelines, the limitations of abstract benchmarks, and the complexity of integrating planning with vehicle control systems collectively impede technology transfer from research to operational autonomous systems.
 
