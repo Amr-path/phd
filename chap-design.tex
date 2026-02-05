@@ -1,4 +1,372 @@
 \chapter{INCREMENTAL LINE SEARCH FRAMEWORK}\label{chap:ils}
 
-% Chapter 3: ILS Framework - To be written
-% This chapter will present the Incremental Line Search (ILS) corridor-constrained pathfinding approach
+This chapter presents the Incremental Line Search (ILS) framework, a corridor-constrained pathfinding approach designed for risk-aware navigation on grid maps. ILS addresses the computational bottleneck of standard A* on large grids by restricting search to a narrow band of cells centred on the Bresenham line connecting start and goal, thereby reducing the effective state space from the full $N \times N$ grid to a strip of width $2w+1$ along the line-of-sight path. The chapter is organised as follows. Section~\ref{sec:theoretical_foundations} establishes the theoretical foundations that underpin corridor-constrained search, collecting the key optimality and efficiency results for A*, LPA*, and the proposed Folding A* algorithm. Section~\ref{sec:corridor_construction} formalises the corridor construction procedure, including Bresenham line computation, neighbourhood expansion, initial width selection, and boundary treatment for 8-connected grids. Section~\ref{sec:ils_design} presents the ILS algorithm itself, introducing the risk-aware composite cost function, describing A* search restricted to the corridor, and providing complete pseudocode. Section~\ref{sec:adaptive_corridor} develops the adaptive corridor widening mechanism that dynamically adjusts corridor width in response to obstructions and risk concentrations, addressing Objective~O2. Section~\ref{sec:ils_analysis} provides a rigorous theoretical analysis of ILS covering completeness, corridor-bounded optimality, and computational complexity. Finally, Section~\ref{sec:ils_summary} summarises the contributions and previews the Folding A* algorithm developed in Chapter~\ref{chap:folding}.
+
+
+\section{Theoretical Foundations}\label{sec:theoretical_foundations}
+
+The ILS framework builds upon well-established results in heuristic search theory. This section collects four foundational theorems that jointly motivate and justify the corridor-constrained search strategy. The first two theorems characterise the optimality and efficiency of A* on arbitrary graphs; the third extends the efficiency guarantee to the incremental setting of Lifelong Planning A*; the fourth states the optimality of the Folding A* algorithm developed in Chapter~\ref{chap:folding} for horizontally symmetric grids. Together, these results establish that restricting A* to a subgraph---such as a corridor---preserves optimality within the restricted space, and that incremental variants can efficiently repair solutions when the corridor or cost structure changes.
+
+\begin{definition}[Admissible Heuristic]\label{def:admissible}
+A heuristic function $h: V \to \mathbb{R}_{\geq 0}$ defined on the vertex set $V$ of a weighted graph $G = (V, E, c)$ is \emph{admissible} if, for every vertex $v \in V$,
+\[
+  h(v) \leq h^{*}(v),
+\]
+where $h^{*}(v)$ denotes the cost of an optimal path from $v$ to the goal vertex $g$.
+\end{definition}
+
+\begin{definition}[Consistent Heuristic]\label{def:consistent}
+A heuristic $h$ is \emph{consistent} (or \emph{monotone}) if, for every edge $(u,v) \in E$ with cost $c(u,v)$,
+\[
+  h(u) \leq c(u,v) + h(v),
+\]
+and $h(g) = 0$. Every consistent heuristic is admissible, though the converse does not hold in general \citep{Russell2021, Felner2011}.
+\end{definition}
+
+\begin{theorem}[Optimality of A*, \citet{Hart1968}]\label{thm:astar_opt}
+Let $G = (V, E, c)$ be a finite weighted graph with non-negative edge costs, let $s, g \in V$ be start and goal vertices, and let $h$ be an admissible heuristic. Then A*, using evaluation function $f(n) = g(n) + h(n)$, returns an optimal path from $s$ to $g$ whenever such a path exists.
+\end{theorem}
+
+\begin{proof}
+Suppose A* terminates by expanding the goal node $g$ with cost $g(g) = C$. Let $P^{*}$ be an optimal path of cost $C^{*}$, and suppose for contradiction that $C > C^{*}$. At the moment $g$ is selected for expansion, every unexpanded node $n$ on $P^{*}$ satisfies $f(n) = g(n) + h(n) \leq g(n) + h^{*}(n) = g^{*}(n) + h^{*}(n) \leq C^{*} < C = f(g)$, since the heuristic is admissible and $g$ values along $P^{*}$ are optimal on the subpath. Thus there exists an unexpanded node with $f$-value strictly less than $f(g)$, contradicting the best-first selection of $g$. Hence $C = C^{*}$. Completeness follows from finiteness of $V$ and the fact that $f$-values are bounded below by zero \citep{Hart1968, Hart1972}.
+\end{proof}
+
+\begin{theorem}[Efficiency of A*, \citet{Dechter1985}]\label{thm:astar_eff}
+Among all best-first search algorithms that use the same consistent heuristic $h$ and break ties in the same manner, A* expands the minimum number of nodes necessary to establish that the solution found is optimal. Specifically, every node $n$ with $f(n) < C^{*}$ must be expanded by any such algorithm, and A* expands no node with $f(n) > C^{*}$.
+\end{theorem}
+
+\begin{proof}
+The result follows from two observations. First, any node $n$ with $f(n) < C^{*}$ must be expanded: if such a node remained unexpanded, the algorithm could not certify that no path through $n$ has cost less than the incumbent solution, since $f(n)$ is a lower bound on the cost of any path through $n$ when $h$ is admissible. Second, A* never expands a node $n$ with $f(n) > C^{*}$: the goal is extracted when its $f$-value equals $C^{*}$, and all subsequently extractable nodes have $f$-values at least $C^{*}$ by the priority queue ordering. Nodes with $f(n) = C^{*}$ may or may not be expanded depending on tie-breaking; the result holds for any fixed tie-breaking rule \citep{Dechter1985}.
+\end{proof}
+
+\begin{theorem}[Efficiency of LPA*, \citet{Koenig2004}]\label{thm:lpa_eff}
+Let $G$ be a finite graph with positive edge costs and let $h$ be a consistent heuristic. When edge costs change, Lifelong Planning A* re-expands only inconsistent nodes---those where $g(n) \neq \mathrm{rhs}(n)$---and the total number of node expansions is no greater than the number of expansions A* would perform if executed from scratch on the updated graph.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+LPA* maintains two estimates for each node: $g(n)$, the current cost-to-come, and $\mathrm{rhs}(n)$, a one-step lookahead estimate. A node is \emph{locally consistent} when $g(n) = \mathrm{rhs}(n)$ and \emph{locally inconsistent} otherwise. After edge-cost changes, LPA* inserts inconsistent nodes into a priority queue keyed by $[\min(g(n), \mathrm{rhs}(n)) + h(n);\ \min(g(n), \mathrm{rhs}(n))]$ and processes them until the goal is locally consistent with a key no less than any queued key. Each processed node is either \emph{overconsistent} ($g(n) > \mathrm{rhs}(n)$, set $g(n) \leftarrow \mathrm{rhs}(n)$) or \emph{underconsistent} ($g(n) < \mathrm{rhs}(n)$, set $g(n) \leftarrow \infty$). This process terminates because each operation strictly reduces inconsistency. The total number of expansions is bounded by the number of expansions A* would perform from scratch, since every node expanded by LPA* would also be expanded by A* on the updated graph \citep{Koenig2004}.
+\end{proof}
+
+\begin{theorem}[Optimality of Folding A*]\label{thm:folding_opt}
+Let $G$ be an $N \times M$ grid with exact horizontal symmetry about the axis $y = \lfloor M/2 \rfloor$, and let the cost function $c$ satisfy $c((x,y),(x',y')) = c((x, M{-}1{-}y),(x', M{-}1{-}y'))$ for all edges. If $h$ is an admissible heuristic on the folded grid $G_F$, then Folding A* returns an optimal path in the full grid $G$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The folding transformation $\phi: V \to V_F$ maps each cell $(x,y)$ to $(x, \min(y, M{-}1{-}y))$. By the symmetry condition on $c$, the cost of any path $P = (v_0, v_1, \ldots, v_k)$ in $G$ equals the cost of the folded path $\phi(P) = (\phi(v_0), \phi(v_1), \ldots, \phi(v_k))$ in $G_F$. Since A* with an admissible heuristic on $G_F$ finds the minimum-cost path in $G_F$, and every path in $G$ has a corresponding equal-cost path in $G_F$, the minimum cost in $G_F$ equals the minimum cost in $G$. Unfolding recovers a valid full-space path of identical cost. The complete proof with all edge cases (paths crossing the axis, start or goal on the axis) is presented in Chapter~\ref{chap:folding}.
+\end{proof}
+
+The practical implication of Theorems~\ref{thm:astar_opt}--\ref{thm:astar_eff} for corridor-constrained search is immediate. If the corridor subgraph $G_C \subseteq G$ is treated as an independent graph, and the heuristic $h$ remains admissible on $G_C$ (which holds for any heuristic admissible on $G$, since restricting the graph cannot decrease optimal path costs), then A* on $G_C$ returns the optimal path among all paths that remain entirely within $G_C$. The ILS framework exploits this observation to achieve reduced computation at the expense of potentially missing paths that exit the corridor. The adaptive widening mechanism of Section~\ref{sec:adaptive_corridor} mitigates this limitation by expanding the corridor when evidence suggests that viable paths lie outside its current boundaries.
+
+
+\section{Corridor Construction}\label{sec:corridor_construction}
+
+The corridor is the central data structure of ILS. It defines the subset of grid cells eligible for expansion during search, thereby determining both the computational cost and the solution quality of the algorithm. This section formalises corridor construction through three stages: computation of the Bresenham reference line, expansion of the line into a band of specified width, and treatment of boundary cells to ensure connectivity.
+
+\subsection{Bresenham Line and Neighbourhood Expansion}\label{subsec:bresenham}
+
+The corridor is anchored on the Bresenham line \citep{Bresenham1965} connecting the start cell $s = (x_s, y_s)$ to the goal cell $g = (x_g, y_g)$. Bresenham's algorithm computes the set of grid cells $\mathcal{L}(s, g)$ that best approximate the continuous line segment from $s$ to $g$ using only integer arithmetic. The algorithm proceeds by stepping along the major axis (the axis with larger absolute displacement) and incrementally adjusting the minor-axis coordinate to minimise the approximation error. The resulting cell sequence $\mathcal{L}(s, g)$ has length $\max(|x_g - x_s|, |y_g - y_s|) + 1$ and satisfies $s, g \in \mathcal{L}(s, g)$.
+
+\begin{definition}[Corridor Region]\label{def:corridor}
+Given a grid $G$ of dimensions $N \times M$, start cell $s$, goal cell $g$, and integer width parameter $w \geq 0$, the \emph{corridor region} $\mathcal{C}(s, g, w)$ is the set of all grid cells within Chebyshev distance $w$ of any cell on the Bresenham line:
+\[
+  \mathcal{C}(s, g, w) = \bigl\{ (x, y) \in G \;\big|\; \exists\, (x_\ell, y_\ell) \in \mathcal{L}(s, g) : \max(|x - x_\ell|, |y - y_\ell|) \leq w \bigr\}.
+\]
+\end{definition}
+
+The Chebyshev distance (also called $L_\infty$ distance) is the natural metric for 8-connected grids, since a single diagonal step changes both coordinates by at most one. Using Chebyshev distance ensures that the corridor has uniform width when measured in the grid's native connectivity, producing a band that encompasses all cells reachable from the line within $w$ king-moves. For a line of length $d = \max(|x_g - x_s|, |y_g - y_s|)$, the corridor contains at most $(2w + 1) \cdot (d + 1)$ cells, though the actual count may be smaller when corridor cells overlap or fall outside the grid boundaries.
+
+\subsection{Initial Corridor Width Selection}\label{subsec:initial_width}
+
+The initial corridor width $w_0$ governs the tradeoff between computational efficiency and solution quality. A narrow corridor reduces the search space but may exclude the optimal path or even all feasible paths when obstacles block the direct line. A wide corridor admits more alternative routes but diminishes the computational advantage over full-grid A*.
+
+The following heuristic guides initial width selection based on environment characteristics:
+
+\begin{equation}\label{eq:initial_width}
+  w_0 = \max\!\Big(w_{\min},\; \Big\lceil \alpha \cdot \frac{d}{1 - \rho} \Big\rceil\Big),
+\end{equation}
+where $d = \|g - s\|_\infty$ is the Chebyshev distance between start and goal, $\rho \in [0, 1)$ is the obstacle density of the grid (fraction of cells that are blocked), $\alpha > 0$ is a tunable scaling factor (empirically set to $0.05$ in the experiments of Chapter~6), and $w_{\min} \geq 1$ is a minimum width ensuring that at least a three-cell-wide corridor is always available. As obstacle density $\rho$ increases, the denominator $1 - \rho$ shrinks, producing wider initial corridors that accommodate the increased likelihood of obstructions along the direct line. When $\rho = 0$ (no obstacles), the formula reduces to $w_0 = \max(w_{\min}, \lceil \alpha \cdot d \rceil)$, providing minimal padding proportional to path length. When $\rho$ approaches~1, the width grows rapidly, reflecting the difficulty of finding unobstructed paths in dense environments.
+
+\begin{proposition}[Width--Complexity Tradeoff]\label{prop:width_tradeoff}
+For a corridor of width $w$ along a Bresenham line of length $d$, the number of cells in $\mathcal{C}(s, g, w)$ is $\Theta(w \cdot d)$. A* search within the corridor has time complexity $O(w \cdot d \cdot \log(w \cdot d))$ using a binary-heap priority queue, compared with $O(N \cdot M \cdot \log(N \cdot M))$ for full-grid A*.
+\end{proposition}
+
+The speedup factor is therefore approximately $\frac{N \cdot M}{(2w+1) \cdot d}$, which for typical scenarios where $d$ is on the order of $N$ and $w \ll M/2$ yields a factor of approximately $M / (2w)$.
+
+\subsection{Corridor Boundary Treatment}\label{subsec:boundary}
+
+Correct treatment of corridor boundaries is essential for ensuring that paths within the corridor are connected and that diagonal moves do not exit the corridor through a gap. Two boundary conditions must be addressed.
+
+\textbf{Grid boundary clipping.} Cells in $\mathcal{C}(s, g, w)$ that fall outside the grid dimensions $[0, N{-}1] \times [0, M{-}1]$ are removed. This clipping may produce an asymmetric corridor near grid edges, but does not affect connectivity since the Bresenham line itself remains within the grid.
+
+\textbf{Diagonal padding for 8-connected grids.} On an 8-connected grid, a diagonal move from $(x, y)$ to $(x+1, y+1)$ requires that both intermediate cells $(x+1, y)$ and $(x, y+1)$ are traversable to avoid corner-cutting through obstacles \citep{Daniel2010}. If the corridor boundary excludes one of these intermediate cells, the diagonal move becomes invalid even though both endpoints lie within the corridor. To prevent this, ILS adds a one-cell padding layer: for every cell $(x, y)$ on the corridor boundary that has a diagonal neighbour $(x \pm 1, y \pm 1)$ also in the corridor, the two axis-aligned cells $(x \pm 1, y)$ and $(x, y \pm 1)$ are included in the corridor if they are within grid bounds. This padding increases the corridor size by at most $4d$ cells (two on each side of the line), which is $O(d)$ and does not change the asymptotic complexity.
+
+\begin{lemma}[Corridor Connectivity]\label{lem:connectivity}
+Let $\mathcal{C}(s, g, w)$ be a corridor with $w \geq 1$ constructed on an 8-connected grid with diagonal padding applied. If the Bresenham line $\mathcal{L}(s, g)$ is free of obstacles, then $\mathcal{C}(s, g, w)$ is connected and contains at least one path from $s$ to $g$.
+\end{lemma}
+
+\begin{proof}
+The Bresenham line $\mathcal{L}(s,g)$ is an 8-connected sequence of cells from $s$ to $g$ by construction. When all cells on $\mathcal{L}(s,g)$ are free, consecutive cells on the line differ by at most one step in each coordinate, forming a valid 8-connected path. Diagonal padding ensures that every diagonal step on this path has its two axis-aligned neighbours included in $\mathcal{C}(s,g,w)$, so the path is traversable under the corner-cutting avoidance rule. Since $w \geq 1$, all cells of $\mathcal{L}(s,g)$ and their immediate Chebyshev neighbours lie within $\mathcal{C}(s,g,w)$, completing the argument.
+\end{proof}
+
+
+\section{ILS Algorithm Design}\label{sec:ils_design}
+
+This section presents the core ILS algorithm, beginning with the composite cost function that integrates distance and risk, followed by the corridor-restricted A* search procedure and its complete pseudocode.
+
+\subsection{Risk-Aware Cost Function}\label{subsec:risk_cost}
+
+The ILS framework operates on grids where each traversable cell $n$ carries a risk value $r(n) \in [0, 1]$ representing exposure hazard---for example, proximity to contaminated zones, restricted operational areas, or high-traffic equipment corridors. The composite edge cost for moving from cell $n$ to neighbour $n'$ is defined as:
+
+\begin{equation}\label{eq:cost}
+  \mathrm{cost}(n, n') = \mathrm{dist}(n, n') + \lambda \cdot r(n'),
+\end{equation}
+where $\mathrm{dist}(n, n')$ is the Euclidean step distance ($1$ for cardinal moves, $\sqrt{2}$ for diagonal moves on an 8-connected grid) and $\lambda \geq 0$ is a user-specified parameter controlling the tradeoff between path length and risk exposure. Setting $\lambda = 0$ recovers standard shortest-path search; increasing $\lambda$ biases paths toward lower-risk cells at the expense of longer detours \citep{Feyzabadi2014, Majumdar2017}.
+
+\begin{proposition}[Admissibility Preservation]\label{prop:admissible_risk}
+Let $h_{\mathrm{geo}}(n)$ be an admissible geometric heuristic for the unweighted grid (e.g., octile distance). Then $h_{\mathrm{geo}}(n)$ remains admissible for the risk-augmented cost function~\eqref{eq:cost} for all $\lambda \geq 0$.
+\end{proposition}
+
+\begin{proof}
+Since $r(n') \geq 0$, the risk-augmented cost satisfies $\mathrm{cost}(n,n') \geq \mathrm{dist}(n,n')$ for every edge. Therefore the optimal path cost under~\eqref{eq:cost} is at least the optimal path cost under distance alone, which in turn is at least $h_{\mathrm{geo}}(n)$ by admissibility of $h_{\mathrm{geo}}$. Hence $h_{\mathrm{geo}}(n) \leq h^{*}_{\lambda}(n)$ for all $n$ and $\lambda \geq 0$.
+\end{proof}
+
+The risk layer enables ILS to balance efficiency and safety without modifying the search algorithm itself: only the edge cost function changes. This separation of concerns allows the same ILS implementation to serve distance-minimising missions ($\lambda = 0$), safety-prioritised missions (large $\lambda$), and intermediate configurations, all through a single parameter.
+
+Two aggregate metrics quantify path quality under risk-aware planning. The \emph{exposure integral} of a path $P = (v_0, v_1, \ldots, v_k)$ is $E(P) = \sum_{i=0}^{k} r(v_i)$, measuring cumulative risk along the path. The \emph{maximum on-path risk} is $R_{\max}(P) = \max_{i} r(v_i)$, capturing worst-case exposure. Both metrics are reported in the experimental evaluation of Chapter~6.
+
+\subsection{A* Search within the Corridor}\label{subsec:corridor_astar}
+
+ILS performs standard A* search on the subgraph induced by the corridor $\mathcal{C}(s, g, w)$. During node expansion, only neighbours that lie within $\mathcal{C}(s, g, w)$ and are traversable (not occupied by obstacles) are generated. The heuristic function $h$ is evaluated identically to full-grid A*; by Proposition~\ref{prop:admissible_risk}, any geometric heuristic admissible on the full grid remains admissible on the corridor subgraph.
+
+The corridor membership test for a cell $(x,y)$ is performed in $O(1)$ time by precomputing a Boolean array $\texttt{inCorridor}[x][y]$ during corridor construction. This avoids per-expansion overhead beyond the constant-time array lookup. Alternatively, for memory-constrained platforms, corridor membership can be tested on-the-fly in $O(\log d)$ time using binary search over the sorted Bresenham line cells, though the array approach is preferred for grids up to $1000 \times 1000$.
+
+\subsection{Algorithm Pseudocode}\label{subsec:pseudocode}
+
+Algorithm~\ref{alg:ils} presents the complete ILS procedure. The algorithm takes as input the grid $G$, start and goal cells $s$ and $g$, corridor half-width $w$, risk weight $\lambda$, and maximum width $w_{\max}$. It returns either an optimal path within the corridor or invokes full A* as a fallback.
+
+\begin{algorithm}[htb!]
+\caption{ILS-Search: Incremental Line Search with Adaptive Widening}\label{alg:ils}
+\begin{algorithmic}[1]
+\Require Grid $G$, start $s$, goal $g$, initial half-width $w$, risk weight $\lambda$, max width $w_{\max}$
+\Ensure Optimal path $P$ within corridor, or globally optimal path via fallback
+\Statex
+\Function{ILS-Search}{$G, s, g, w, \lambda, w_{\max}$}
+  \State $\mathcal{L} \gets \Call{BresenhamLine}{s, g}$ \Comment{Compute reference line}
+  \State $\mathcal{C} \gets \Call{BuildCorridor}{\mathcal{L}, w, G}$ \Comment{Expand to corridor with padding}
+  \State $P \gets \Call{CorridorAStar}{G, s, g, \mathcal{C}, \lambda}$ \Comment{A* restricted to $\mathcal{C}$}
+  \If{$P \neq \textsc{Failure}$}
+    \State \Return $P$
+  \EndIf
+  \Statex \Comment{--- Adaptive widening phase ---}
+  \State $b \gets \Call{DetectObstruction}{G, \mathcal{C}, s, g}$ \Comment{Locate blockage}
+  \State $w' \gets w$
+  \While{$P = \textsc{Failure}$ \textbf{and} $w' < w_{\max}$}
+    \State $\Delta w \gets \Call{ComputeWidening}{b, G, w'}$ \Comment{Local or global widening}
+    \State $w' \gets \min(w' + \Delta w,\; w_{\max})$
+    \State $\mathcal{C} \gets \Call{BuildCorridor}{\mathcal{L}, w', G}$
+    \State $P \gets \Call{CorridorAStar}{G, s, g, \mathcal{C}, \lambda}$
+    \State $b \gets \Call{DetectObstruction}{G, \mathcal{C}, s, g}$ \Comment{Update obstruction}
+  \EndWhile
+  \If{$P = \textsc{Failure}$}
+    \State $P \gets \Call{FullAStar}{G, s, g, \lambda}$ \Comment{Fallback to unconstrained A*}
+  \EndIf
+  \State \Return $P$
+\EndFunction
+\Statex
+\Function{CorridorAStar}{$G, s, g, \mathcal{C}, \lambda$}
+  \State Initialise open list $\mathcal{O} \gets \{s\}$, closed set $\mathcal{X} \gets \emptyset$
+  \State $g(s) \gets 0$;\; $f(s) \gets h(s)$
+  \While{$\mathcal{O} \neq \emptyset$}
+    \State $n \gets \arg\min_{u \in \mathcal{O}} f(u)$ \Comment{Extract minimum $f$-value node}
+    \If{$n = g$}
+      \State \Return \Call{ReconstructPath}{$n$}
+    \EndIf
+    \State Move $n$ from $\mathcal{O}$ to $\mathcal{X}$
+    \ForAll{neighbours $n'$ of $n$ in $G$}
+      \If{$n' \notin \mathcal{C}$ \textbf{or} $n'$ is an obstacle \textbf{or} $n' \in \mathcal{X}$}
+        \State \textbf{continue}
+      \EndIf
+      \State $g_{\mathrm{new}} \gets g(n) + \mathrm{dist}(n, n') + \lambda \cdot r(n')$
+      \If{$n' \notin \mathcal{O}$ \textbf{or} $g_{\mathrm{new}} < g(n')$}
+        \State $g(n') \gets g_{\mathrm{new}}$;\; $f(n') \gets g(n') + h(n')$
+        \State $\mathrm{parent}(n') \gets n$
+        \State Insert or update $n'$ in $\mathcal{O}$
+      \EndIf
+    \EndFor
+  \EndWhile
+  \State \Return \textsc{Failure}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+The \textsc{BresenhamLine} subroutine implements Bresenham's line algorithm in $O(d)$ time \citep{Bresenham1965}. The \textsc{BuildCorridor} subroutine iterates over line cells, marking all cells within Chebyshev distance $w$ and applying diagonal padding, in $O(w \cdot d)$ time. The \textsc{DetectObstruction} subroutine, detailed in Section~\ref{sec:adaptive_corridor}, identifies the location along the line where the corridor is blocked.
+
+
+\section{Adaptive Corridor Widening}\label{sec:adaptive_corridor}
+
+A fixed-width corridor may fail to contain any feasible path when obstacles or high-risk regions block the direct line. The adaptive corridor widening mechanism addresses this limitation by expanding the corridor incrementally, guided by the location and nature of the obstruction. This section develops three widening strategies: obstruction-based local expansion, risk-spike response, and width convergence with fallback.
+
+\subsection{Obstruction Detection and Local Expansion}\label{subsec:obstruction}
+
+When \textsc{CorridorAStar} returns \textsc{Failure}, the obstruction detection procedure identifies the segment of the Bresenham line most responsible for the blockage. The procedure examines cells along $\mathcal{L}(s,g)$ and identifies the contiguous subsequence $\mathcal{L}[i_1 \ldots i_2]$ where the corridor cross-section is most severely blocked, defined as the segment maximising the ratio of obstacle cells to total cells in the local cross-section.
+
+\begin{definition}[Obstruction Index]\label{def:obstruction}
+For each line cell $\ell_i \in \mathcal{L}(s,g)$, the \emph{obstruction ratio} at index $i$ is
+\[
+  \beta_i = \frac{|\{(x,y) \in \mathcal{C}_i : (x,y) \text{ is an obstacle}\}|}{|\mathcal{C}_i|},
+\]
+where $\mathcal{C}_i = \{(x,y) \in \mathcal{C}(s,g,w) : \max(|x - x_{\ell_i}|, |y - y_{\ell_i}|) \leq w\}$ is the corridor cross-section at $\ell_i$. The \emph{obstruction centre} is $b = \arg\max_i \beta_i$.
+\end{definition}
+
+Local expansion widens the corridor only in the vicinity of the obstruction. Given obstruction centre $b$ and expansion margin $\Delta w$, the corridor is augmented to width $w + \Delta w$ for line indices $[b - \delta, b + \delta]$, where $\delta$ is a neighbourhood radius (typically set to $\max(w, 5)$). This targeted approach avoids the computational cost of uniformly widening the entire corridor when the blockage is localised:
+
+\begin{equation}\label{eq:local_widen}
+  \mathcal{C}'(s, g, w, \Delta w, b, \delta) = \mathcal{C}(s, g, w) \;\cup\; \bigcup_{j=b-\delta}^{b+\delta} \bigl\{(x,y) \in G : \max(|x - x_{\ell_j}|, |y - y_{\ell_j}|) \leq w + \Delta w \bigr\}.
+\end{equation}
+
+The increment $\Delta w$ is chosen proportionally to the obstruction severity: $\Delta w = \lceil \beta_b \cdot w \rceil + 1$, ensuring that more severely blocked segments receive wider expansions. This adaptive sizing avoids both excessively conservative increments (which may require many iterations) and excessively aggressive increments (which waste computational resources).
+
+\subsection{Risk-Spike Response}\label{subsec:risk_spike}
+
+Even when the corridor contains a feasible path, the path may traverse regions of unacceptably high risk. The risk-spike response mechanism detects such situations and widens the corridor to provide detour options around risk concentrations.
+
+\begin{definition}[Corridor Risk Profile]\label{def:risk_profile}
+The \emph{average cross-sectional risk} at line index $i$ is
+\[
+  \bar{r}_i = \frac{1}{|\mathcal{C}_i^{\mathrm{free}}|} \sum_{(x,y) \in \mathcal{C}_i^{\mathrm{free}}} r(x,y),
+\]
+where $\mathcal{C}_i^{\mathrm{free}}$ is the set of non-obstacle cells in the cross-section $\mathcal{C}_i$.
+\end{definition}
+
+A \emph{risk spike} is detected at index $i$ when $\bar{r}_i > \tau$ for a user-specified threshold $\tau \in (0, 1]$. When a risk spike is detected, the corridor is widened locally around the spike using the same mechanism as obstruction-based expansion (Equation~\ref{eq:local_widen}), with $\Delta w$ set proportionally to the excess risk: $\Delta w = \lceil (\bar{r}_i - \tau) / \tau \cdot w \rceil + 1$. The intuition is that wider corridors provide more lateral freedom for the search to route around high-risk cells, and the excess risk magnitude indicates how far the path may need to deviate.
+
+Risk-spike detection is performed after a successful path is found within the corridor. If the exposure integral $E(P)$ or the maximum on-path risk $R_{\max}(P)$ exceeds mission-specific thresholds, the corridor is widened at identified spike locations and the search is repeated. This post-hoc approach avoids the overhead of risk monitoring during the initial search while ensuring that final paths satisfy exposure constraints.
+
+\subsection{Width Convergence and Fallback}\label{subsec:convergence}
+
+The adaptive widening process terminates under one of three conditions:
+
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Path found:} \textsc{CorridorAStar} returns a valid path that satisfies all constraints.
+  \item \textbf{Maximum width reached:} The corridor width reaches $w_{\max}$. If $w_{\max} = \max(N, M)$, the corridor covers the entire grid, and \textsc{CorridorAStar} is equivalent to full A*. In practice, $w_{\max}$ is set to a fraction of the grid dimension (e.g., $\lfloor M/2 \rfloor$) to bound worst-case computation.
+  \item \textbf{Fallback:} If widening to $w_{\max}$ still fails, ILS invokes standard A* on the full grid as a fallback, guaranteeing completeness.
+\end{enumerate}
+
+\begin{proposition}[Widening Termination]\label{prop:termination}
+The adaptive widening loop in Algorithm~\ref{alg:ils} terminates after at most $\lceil (w_{\max} - w) / \Delta w_{\min} \rceil$ iterations, where $\Delta w_{\min} \geq 1$ is the minimum widening increment.
+\end{proposition}
+
+\begin{proof}
+Each iteration increases $w'$ by at least $\Delta w_{\min} \geq 1$. The loop guard $w' < w_{\max}$ ensures termination once $w'$ reaches $w_{\max}$. Since $w' \leq w_{\max}$ after each update (due to the $\min$ operation), the number of iterations is bounded by $\lceil (w_{\max} - w_0) / \Delta w_{\min} \rceil$.
+\end{proof}
+
+
+\section{Theoretical Analysis of ILS}\label{sec:ils_analysis}
+
+This section establishes the formal properties of ILS: completeness, optimality within the corridor, and computational complexity. The analysis assumes 8-connected grids with non-negative edge costs and consistent heuristics unless otherwise stated.
+
+\subsection{Completeness}\label{subsec:completeness}
+
+\begin{theorem}[Completeness of ILS]\label{thm:completeness}
+Let $G$ be a finite grid and let $s, g \in G$ be start and goal cells. If a path from $s$ to $g$ exists in $G$ and $w_{\max} \geq \max(N, M)$, then ILS-Search (Algorithm~\ref{alg:ils}) returns a valid path from $s$ to $g$.
+\end{theorem}
+
+\begin{proof}
+If the initial corridor search succeeds, the result is immediate. Otherwise, the adaptive widening phase increases the corridor width up to $w_{\max}$. When $w_{\max} \geq \max(N, M)$, the corridor $\mathcal{C}(s, g, w_{\max})$ contains all cells of $G$, since for any cell $(x,y) \in G$ and any line cell $\ell \in \mathcal{L}(s,g)$, the Chebyshev distance $\max(|x - x_\ell|, |y - y_\ell|) \leq \max(N, M) \leq w_{\max}$. Therefore \textsc{CorridorAStar} on $\mathcal{C}(s, g, w_{\max})$ is equivalent to A* on the full grid $G$. By the completeness of A* on finite graphs with non-negative costs \citep{Hart1968, Russell2021}, a path is found if one exists. If even this search fails (the path does not exist), the fallback A* confirms non-existence. Hence ILS-Search is complete.
+\end{proof}
+
+In practice, setting $w_{\max}$ to a value smaller than $\max(N, M)$ trades theoretical completeness for computational bounds. The fallback to full A* on line~17 of Algorithm~\ref{alg:ils} restores completeness regardless of $w_{\max}$.
+
+\subsection{Optimality within the Corridor}\label{subsec:optimality}
+
+\begin{theorem}[Corridor-Bounded Optimality]\label{thm:corridor_opt}
+Let $\mathcal{C} = \mathcal{C}(s, g, w)$ be a corridor, let $h$ be an admissible heuristic, and let $\lambda \geq 0$. Then \textsc{CorridorAStar}$(G, s, g, \mathcal{C}, \lambda)$ returns a path $P^{*}_{\mathcal{C}}$ that is optimal among all paths from $s$ to $g$ that lie entirely within $\mathcal{C}$:
+\[
+  \mathrm{cost}(P^{*}_{\mathcal{C}}) = \min \bigl\{ \mathrm{cost}(P) \;\big|\; P \text{ is a path from } s \text{ to } g \text{ in } G[\mathcal{C}] \bigr\},
+\]
+where $G[\mathcal{C}]$ is the subgraph of $G$ induced by the cells in $\mathcal{C}$.
+\end{theorem}
+
+\begin{proof}
+The subgraph $G[\mathcal{C}]$ is a finite graph with non-negative edge costs (since $\mathrm{dist} > 0$ and $\lambda \cdot r \geq 0$). The heuristic $h$ is admissible on $G[\mathcal{C}]$ because optimal paths in $G[\mathcal{C}]$ are at least as costly as optimal paths in $G$ (the subgraph has fewer or equal path options), so $h(n) \leq h^{*}_{G}(n) \leq h^{*}_{G[\mathcal{C}]}(n)$. By Theorem~\ref{thm:astar_opt}, A* on $G[\mathcal{C}]$ with admissible heuristic returns an optimal path in $G[\mathcal{C}]$. The \textsc{CorridorAStar} procedure implements precisely A* on $G[\mathcal{C}]$ (filtering neighbours not in $\mathcal{C}$), so the result follows.
+\end{proof}
+
+\begin{corollary}[Global Optimality Condition]\label{cor:global_opt}
+If the globally optimal path $P^{*}$ from $s$ to $g$ in $G$ lies entirely within $\mathcal{C}(s, g, w)$, then ILS returns $P^{*}$.
+\end{corollary}
+
+\begin{proof}
+Since $P^{*} \subseteq G[\mathcal{C}]$, it is a feasible path in the corridor subgraph. By Theorem~\ref{thm:corridor_opt}, ILS returns a path of cost $\mathrm{cost}(P^{*}_{\mathcal{C}}) \leq \mathrm{cost}(P^{*})$. But $P^{*}$ is globally optimal, so $\mathrm{cost}(P^{*}_{\mathcal{C}}) \geq \mathrm{cost}(P^{*})$. Hence equality holds and ILS returns an optimal path.
+\end{proof}
+
+Corollary~\ref{cor:global_opt} characterises the favourable case: when obstacles do not force detours beyond the corridor boundary, ILS achieves global optimality with substantially reduced computation. In structured environments such as port terminals where obstacles tend to be localised and corridors between container blocks provide direct routes, this condition holds frequently.
+
+\subsection{Complexity Analysis}\label{subsec:complexity}
+
+\begin{theorem}[Time and Space Complexity of ILS]\label{thm:complexity}
+Let $d = \max(|x_g - x_s|, |y_g - y_s|)$ be the Chebyshev distance between start and goal, and let $w$ be the corridor half-width. Then:
+\begin{enumerate}[label=(\alph*)]
+  \item The corridor $\mathcal{C}(s,g,w)$ contains $\Theta(w \cdot d)$ cells.
+  \item \textsc{CorridorAStar} runs in $O(w \cdot d \cdot \log(w \cdot d))$ time using a binary-heap open list.
+  \item \textsc{CorridorAStar} uses $O(w \cdot d)$ space for the open list, closed set, and parent pointers.
+  \item Full-grid A* on an $N \times M$ grid runs in $O(N \cdot M \cdot \log(N \cdot M))$ time and $O(N \cdot M)$ space.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\emph{Part (a):} The Bresenham line has length $d + 1$. Each line cell contributes a cross-section of at most $(2w+1)^2$ cells, but adjacent cross-sections overlap substantially. The non-overlapping count is $(2w+1)(d+1) - O(w^2)$ (subtracting the end-cap overlaps), which is $\Theta(w \cdot d)$ for $d \gg w$.
+
+\emph{Part (b):} A* on a graph with $|V|$ vertices and branching factor $b$ using a binary heap runs in $O(|V| \cdot b \cdot \log |V|)$ time in the worst case. For a corridor with $|V| = \Theta(w \cdot d)$ cells and constant branching factor $b = 8$ on an 8-connected grid, this is $O(w \cdot d \cdot \log(w \cdot d))$.
+
+\emph{Part (c):} Each cell requires constant space for $g$-value, $f$-value, parent pointer, and open/closed status. The open list contains at most $|V|$ entries. Total space is $O(|V|) = O(w \cdot d)$.
+
+\emph{Part (d):} Applying the same analysis to the full grid with $|V| = N \cdot M$ yields the stated bounds.
+\end{proof}
+
+\begin{corollary}[Speedup Factor]\label{cor:speedup}
+The ratio of full-grid A* time to corridor A* time is
+\[
+  S = \frac{O(N \cdot M \cdot \log(N \cdot M))}{O(w \cdot d \cdot \log(w \cdot d))}.
+\]
+For square grids ($M = N$) with $d = \Theta(N)$ and $w \ll N$, this simplifies to $S = \Theta\!\left(\frac{N}{w} \cdot \frac{\log(N^2)}{\log(wN)}\right) \approx \Theta(N / w)$, providing near-linear speedup in the ratio of grid dimension to corridor width.
+\end{corollary}
+
+Table~\ref{tab:complexity_comparison} compares the complexity of ILS with full-grid A* and other relevant algorithms.
+
+\begin{table}[htb!]
+\centering
+\caption{Complexity Comparison of Pathfinding Approaches on $N \times N$ Grids}
+\label{tab:complexity_comparison}
+\begin{tabular}{|p{3.5cm}|p{3.5cm}|p{3cm}|p{3cm}|}
+\hline
+\textbf{Algorithm} & \textbf{Time Complexity} & \textbf{Space Complexity} & \textbf{Notes} \\
+\hline
+A* (full grid) \citep{Hart1968} & $O(N^2 \log N^2)$ worst case & $O(N^2)$ & Globally optimal \\
+\hline
+Dijkstra \citep{Dijkstra1959} & $O(N^2 \log N^2)$ & $O(N^2)$ & No heuristic \\
+\hline
+ILS (corridor $w$) & $O(w \cdot d \cdot \log(wd))$ & $O(w \cdot d)$ & Corridor-optimal \\
+\hline
+LPA* \citep{Koenig2004} & $O(k \log k)$ per update & $O(N^2)$ & $k$ = changed nodes \\
+\hline
+D* Lite \citep{Koenig2002} & $O(k \log k)$ per update & $O(N^2)$ & Moving robot \\
+\hline
+JPS \citep{Harabor2014} & $O(N^2)$ worst case & $O(N^2)$ & Uniform costs only \\
+\hline
+\end{tabular}
+\end{table}
+
+The key advantage of ILS is that its complexity depends on corridor size $w \cdot d$ rather than total grid size $N^2$. For typical navigation scenarios where start and goal are separated by a distance $d = \Theta(N)$ and a narrow corridor of width $w = O(\sqrt{N})$ suffices, ILS achieves $O(N^{3/2} \log N)$ time compared with $O(N^2 \log N)$ for full A*---a factor of $\sqrt{N}$ improvement. In the common case where $w$ is a small constant (e.g., $w = 5$), the improvement is a factor of $N / 10$, making ILS particularly effective on large grids.
+
+
+\section{Summary}\label{sec:ils_summary}
+
+This chapter has presented the Incremental Line Search framework, a corridor-constrained pathfinding approach that addresses two of the four research objectives of this thesis.
+
+\textbf{Objective O1: Corridor-constrained search for risk-aware pathfinding.} The ILS framework constrains A* search to a corridor of width $2w + 1$ centred on the Bresenham line between start and goal. The corridor construction procedure (Section~\ref{sec:corridor_construction}) formalises the corridor region using Chebyshev distance, provides heuristics for initial width selection, and ensures connectivity through diagonal padding. The risk-aware cost function (Section~\ref{sec:ils_design}) integrates distance and risk through a single parameter $\lambda$, enabling flexible tradeoff between path length and exposure. Theorem~\ref{thm:corridor_opt} establishes that ILS returns the optimal path among all paths within the corridor, and Corollary~\ref{cor:global_opt} identifies the condition under which corridor-bounded optimality coincides with global optimality. The complexity analysis (Theorem~\ref{thm:complexity}) demonstrates that ILS achieves time complexity $O(w \cdot d \cdot \log(w \cdot d))$, providing speedups proportional to $N/w$ over full-grid A*.
+
+\textbf{Objective O2: Adaptive corridor control.} The adaptive widening mechanism (Section~\ref{sec:adaptive_corridor}) dynamically adjusts corridor width in response to obstructions and risk concentrations. Obstruction detection identifies blocked segments, and local expansion widens the corridor only where needed, preserving computational efficiency in unblocked regions. Risk-spike response detects high-risk corridor cross-sections and provides lateral expansion for detour routing. The convergence analysis (Proposition~\ref{prop:termination}) guarantees that widening terminates, and the fallback to full A* ensures completeness (Theorem~\ref{thm:completeness}).
+
+The theoretical foundations established in Section~\ref{sec:theoretical_foundations}---including the optimality and efficiency results for A* (Theorems~\ref{thm:astar_opt}--\ref{thm:astar_eff}), the efficiency of LPA* (Theorem~\ref{thm:lpa_eff}), and the optimality of Folding A* (Theorem~\ref{thm:folding_opt})---provide the rigorous basis for both the corridor-constrained approach and the symmetry-exploitation technique developed in the next chapter.
+
+Chapter~\ref{chap:folding} extends the algorithmic framework by developing Folding A* for horizontally symmetric grids, addressing Objective~O3. The folding transformation halves the effective state space for symmetric environments, and the complete proof of Theorem~\ref{thm:folding_opt} is provided therein. The combination of ILS corridor restriction and Folding A* symmetry reduction offers complementary computational savings that are evaluated experimentally in Chapter~6.
