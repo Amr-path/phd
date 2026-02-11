@@ -522,9 +522,10 @@ Figure~\ref{fig:strategy_flowchart} illustrates the strategy-selection logic.
 % Decision 2: No -> Predictive
 \draw[arrow] (d2.south) -- node[left, font=\scriptsize] {No} (predictive.north);
 
-% Strategies to Build Corridor
-\draw[arrow] (base.south) |- ([yshift=0.2cm]build.east);
-\draw[arrow] (standard.south) |- (build.east);
+% Strategies to Build Corridor --- route through a shared vertical rail
+\coordinate (rail) at ([xshift=0.6cm]build.east);
+\draw[arrow] (base.south) |- (rail) -- ([yshift=0.15cm]build.east);
+\draw[arrow] (standard.south) |- (rail |- build.east) -- (build.east);
 \draw[arrow] (predictive.south) -- (build.north);
 
 % Build to End
@@ -842,9 +843,6 @@ Figure~\ref{fig:ails_architecture} illustrates the four-stage architecture.
 % --- Fallback ---
 \node[failbox, below right=0.4cm and 1.2cm of dec] (fallback) {Fallback:\\[-1pt]\scriptsize BFS Expansion\\$\mathcal{C}_a \gets \mathcal{C}_a'$};
 
-% --- No path exists ---
-\node[failbox, fill=gray!15, below=0.8cm of fallback] (nopath) {No path in $G$};
-
 % --- Arrows: main flow ---
 \draw[arrow] (input) -- (s1);
 \draw[arrow] (s1) -- (s2);
@@ -857,10 +855,11 @@ Figure~\ref{fig:ails_architecture} illustrates the four-stage architecture.
 \draw[arrow] (dec.south) |- node[pos=0.3, right, font=\scriptsize] {No} (fallback.west);
 
 % --- Fallback loop (dashed) back to Stage 4 ---
-\draw[darrow] (fallback.west) -- ++(-1.0cm,0) |- node[pos=0.5, below, font=\scriptsize\itshape, text=red!60!black] {Expand corridor, retry search} ([yshift=-0.25cm]s4.south) -- (s4.south);
+\draw[darrow] (fallback.south) -- ++(0,-0.6cm) -| node[pos=0.25, below, font=\scriptsize\itshape, text=red!60!black] {Expand corridor, retry search} (s4.south);
 
 % --- Full grid check ---
-\draw[arrow] (fallback.south) -- node[right, font=\scriptsize] {$\mathcal{C}_a = V$} (nopath.north);
+\node[failbox, fill=gray!15, right=1.0cm of fallback] (nopath) {No path in $G$};
+\draw[arrow] (fallback.east) -- node[above, font=\scriptsize] {$\mathcal{C}_a = V$} (nopath.west);
 
 % --- Strategy selection annotation ---
 \node[font=\scriptsize\itshape, text=violet!70!black, anchor=north] at ([yshift=-0.15cm]s3.south) {Strategy selection};
