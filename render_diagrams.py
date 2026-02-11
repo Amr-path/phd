@@ -63,17 +63,13 @@ def render_tikz_to_png(name, tikz_code, output_dir, dpi=300):
         # Write standalone LaTeX file
         clean_code = tikz_code
 
-        # Replace \eqref{...} cross-references with hardcoded text since
-        # standalone compilation has no access to the thesis equation counters.
-        # The formulas are already shown inline, so we just remove the Eq. refs.
-        clean_code = clean_code.replace(
-            r"via Eq.~\eqref{eq:radius_standard}", ""
-        )
-        clean_code = clean_code.replace(
-            r"via Eq.~\eqref{eq:radius_gradient}", ""
-        )
-        # Catch any remaining \eqref and remove them
+        # Replace cross-references that are unavailable in standalone compilation.
+        # Remove "via Eq.~\eqref{...}" patterns and any remaining \eqref commands.
+        clean_code = re.sub(r"via\s+Eq\.~?\\eqref\{[^}]*\}", "", clean_code)
+        clean_code = re.sub(r"Eq\.~?\\eqref\{[^}]*\}", "", clean_code)
         clean_code = re.sub(r"\\eqref\{[^}]*\}", "", clean_code)
+        # Remove any \citep or \cite references
+        clean_code = re.sub(r"\\cite[pt]?\{[^}]*\}", "", clean_code)
 
         latex_content = PREAMBLE + "\n" + clean_code + "\n" + POSTAMBLE
         with open(tex_path, "w") as f:
