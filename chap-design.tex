@@ -11,7 +11,82 @@ The research framework comprised four methodological pipelines, each designed to
 
 \begin{figure}[htb!]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering\vspace{2em}\textbf{TODO: Insert framework overview diagram showing the four pipelines (Baseline, ILS, AILS, Planning-to-Flight) and their data flow.}\vspace{2em}}}
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    node distance=1.0cm and 0.6cm,
+    dsbox/.style={rectangle, draw, fill=blue!8, minimum width=2.0cm, minimum height=0.7cm,
+                  font=\footnotesize, rounded corners=2pt, align=center},
+    prepbox/.style={rectangle, draw, fill=orange!12, minimum width=10.0cm, minimum height=0.8cm,
+                    font=\small\bfseries, rounded corners=3pt, align=center},
+    pipebox/.style={rectangle, draw, thick, fill=#1, minimum width=3.4cm, minimum height=2.6cm,
+                    rounded corners=4pt, align=center, font=\small},
+    pipetitle/.style={font=\small\bfseries, align=center},
+    pipedesc/.style={font=\scriptsize, align=center, text width=3.0cm},
+    metricbox/.style={rectangle, draw, fill=green!8, minimum width=10.0cm, minimum height=0.8cm,
+                      font=\small\bfseries, rounded corners=3pt, align=center},
+    arrow/.style={->, thick, >=Stealth},
+    darrow/.style={->, thick, >=Stealth, dashed},
+]
+
+% --- Datasets row ---
+\node[dsbox] (ds1) {DS1\\[-1pt]\scriptsize Fixed-Size};
+\node[dsbox, right=0.4cm of ds1] (ds2) {DS2\\[-1pt]\scriptsize Variable-Size};
+\node[dsbox, right=0.4cm of ds2] (ds3) {DS3\\[-1pt]\scriptsize Topology-Varied};
+\node[dsbox, right=0.4cm of ds3] (ds4) {DS4\\[-1pt]\scriptsize Satellite-Derived};
+
+% Datasets label
+\node[above=0.15cm of ds2.north east, font=\small\bfseries] {Datasets};
+
+% --- Preprocessing ---
+\node[prepbox, below=0.9cm of $(ds2.south)!0.5!(ds3.south)$] (preproc) {Preprocessing Pipeline (Steps 1--9)};
+
+% Arrows from datasets to preprocessing
+\foreach \ds in {ds1, ds2, ds3, ds4}{
+    \draw[arrow] (\ds.south) -- (preproc.north -| \ds.south);
+}
+
+% Label for output
+\node[below=0.15cm of preproc.south, font=\scriptsize\itshape] (prepout) {Binary Occupancy Grid $G = (V, E, w)$ + Start/Goal};
+
+% --- Four Pipelines ---
+\node[pipebox=red!8, below=1.4cm of preproc.south west, xshift=0.2cm] (p1) {};
+\node[pipetitle, anchor=north] at ([yshift=-0.15cm]p1.north) {Pipeline 1};
+\node[pipedesc, anchor=north] at ([yshift=-0.55cm]p1.north) {Baseline Planner\\[2pt]\scriptsize Full-grid search\\(A*, Dijkstra, BFS,\\DFS, Best-First)\\[2pt]\scriptsize No corridor};
+
+\node[pipebox=cyan!8, right=0.5cm of p1] (p2) {};
+\node[pipetitle, anchor=north] at ([yshift=-0.15cm]p2.north) {Pipeline 2};
+\node[pipedesc, anchor=north] at ([yshift=-0.55cm]p2.north) {ILS-Enhanced\\[2pt]\scriptsize Uniform-width\\corridor + incremental\\expansion\\[2pt]\scriptsize Fixed $w_0$};
+
+\node[pipebox=violet!8, right=0.5cm of p2] (p3) {};
+\node[pipetitle, anchor=north] at ([yshift=-0.15cm]p3.north) {Pipeline 3};
+\node[pipedesc, anchor=north] at ([yshift=-0.55cm]p3.north) {Adaptive ILS\\[2pt]\scriptsize Density-adaptive\\corridor via integral\\images\\[2pt]\scriptsize Variable $r(p)$};
+
+\node[pipebox=yellow!12, right=0.5cm of p3] (p4) {};
+\node[pipetitle, anchor=north] at ([yshift=-0.15cm]p4.north) {Pipeline 4};
+\node[pipedesc, anchor=north] at ([yshift=-0.55cm]p4.north) {Planning-to-Flight\\[2pt]\scriptsize Drone deployment\\via DroneKit /\\ROS--MAVROS\\[2pt]\scriptsize ArduPilot};
+
+% Arrows from preprocessing to pipelines
+\foreach \p in {p1, p2, p3, p4}{
+    \draw[arrow] (preproc.south -| \p.north) -- (\p.north);
+}
+
+% --- Evaluation Metrics ---
+\node[metricbox, below=0.9cm of $(p2.south)!0.5!(p3.south)$] (metrics) {Evaluation Metrics};
+\node[below=0.1cm of metrics.south, font=\scriptsize\itshape, align=center] (metdesc) {Execution Time \,\textbar\, Visited Nodes \,\textbar\, Path Length \,\textbar\, Optimality Rate \,\textbar\, Corridor Efficiency};
+
+% Arrows from pipelines to metrics
+\foreach \p in {p1, p2, p3, p4}{
+    \draw[arrow] (\p.south) -- (metrics.north -| \p.south);
+}
+
+% --- Progressive arrows between pipelines ---
+\draw[darrow, blue!60] ([yshift=-0.15cm]p1.east) -- ([yshift=-0.15cm]p2.west) node[midway, above, font=\tiny\itshape] {+corridor};
+\draw[darrow, blue!60] ([yshift=-0.15cm]p2.east) -- ([yshift=-0.15cm]p3.west) node[midway, above, font=\tiny\itshape] {+adaptive};
+\draw[darrow, blue!60] ([yshift=-0.15cm]p3.east) -- ([yshift=-0.15cm]p4.west) node[midway, above, font=\tiny\itshape] {+flight};
+
+\end{tikzpicture}%
+}
 \caption{Overview of the proposed research framework. The four pipelines share common grid representations and evaluation metrics but differ in their search-space restriction strategy.}
 \label{fig:framework_overview}
 \end{figure}
@@ -104,7 +179,76 @@ Figure~\ref{fig:preprocessing} illustrates the preprocessing pipeline.
 
 \begin{figure}[htb!]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering\vspace{2em}\textbf{TODO: Insert preprocessing pipeline flowchart showing Steps~1--9.}\vspace{2em}}}
+\resizebox{0.88\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    node distance=0.55cm,
+    stepbox/.style={rectangle, draw, thick, fill=blue!6, minimum width=6.5cm, minimum height=0.75cm,
+                    rounded corners=3pt, font=\small, align=center},
+    startbox/.style={rectangle, draw, thick, fill=green!10, minimum width=6.5cm, minimum height=0.75cm,
+                     rounded corners=3pt, font=\small, align=center},
+    endbox/.style={rectangle, draw, thick, fill=orange!10, minimum width=6.5cm, minimum height=0.75cm,
+                   rounded corners=3pt, font=\small, align=center},
+    condbox/.style={diamond, draw, thick, fill=yellow!10, minimum width=1.8cm, minimum height=0.9cm,
+                    font=\scriptsize, align=center, aspect=2.5},
+    arrow/.style={->, thick, >=Stealth},
+    note/.style={font=\scriptsize\itshape, text=gray!70!black},
+]
+
+% --- Step 1 ---
+\node[startbox] (s1) {\textbf{Step 1:} Image Acquisition / Procedural Generation};
+\node[note, right=0.3cm of s1] {DS4: satellite image; DS1--DS3: synthetic};
+
+% --- Step 2 ---
+\node[stepbox, below=0.55cm of s1] (s2) {\textbf{Step 2:} Greyscale Conversion};
+\node[note, right=0.3cm of s2] {Colour $\to$ 8-bit greyscale};
+
+% --- Step 3 ---
+\node[stepbox, below=0.55cm of s2] (s3) {\textbf{Step 3:} Binary Thresholding};
+\node[note, right=0.3cm of s3] {Threshold $= 128$};
+
+% --- Step 4 ---
+\node[stepbox, below=0.55cm of s3] (s4) {\textbf{Step 4:} Grid Construction};
+\node[note, right=0.3cm of s4] {$G = (V, E, w)$; 8- or 4-connected};
+
+% --- Step 5 ---
+\node[stepbox, below=0.55cm of s4] (s5) {\textbf{Step 5:} Obstacle Density Verification};
+\node[note, right=0.3cm of s5] {Synthetic only; $\leq 1\%$ deviation};
+
+% --- Step 6 ---
+\node[stepbox, below=0.55cm of s5] (s6) {\textbf{Step 6:} Start and Goal Assignment};
+\node[note, right=0.3cm of s6] {Fixed / random / user-specified};
+
+% --- Step 7 ---
+\node[stepbox, below=0.55cm of s6] (s7) {\textbf{Step 7:} Reachability Check};
+\node[note, right=0.3cm of s7] {BFS from start to goal};
+
+% --- Step 8 (conditional) ---
+\node[condbox, below=0.75cm of s7] (cond) {AILS\\pipeline?};
+
+\node[stepbox, fill=violet!8, below right=0.6cm and 1.5cm of cond] (s8) {\textbf{Step 8:} Integral Image Computation};
+\node[note, right=0.3cm of s8] {Summed-area table; $O(|V|)$};
+
+% --- Step 9 ---
+\node[endbox, below=1.8cm of cond] (s9) {\textbf{Step 9:} Output};
+\node[note, right=0.3cm of s9] {Grid + start/goal + integral image};
+
+% --- Arrows ---
+\draw[arrow] (s1) -- (s2);
+\draw[arrow] (s2) -- (s3);
+\draw[arrow] (s3) -- (s4);
+\draw[arrow] (s4) -- (s5);
+\draw[arrow] (s5) -- (s6);
+\draw[arrow] (s6) -- (s7);
+\draw[arrow] (s7) -- (cond);
+
+% Conditional branches
+\draw[arrow] (cond.east) -- ++(0.5cm,0) |- node[pos=0.25, above, font=\scriptsize] {Yes} (s8.west);
+\draw[arrow] (s8.south) |- (s9.east);
+\draw[arrow] (cond.south) -- node[left, font=\scriptsize] {No} (s9.north);
+
+\end{tikzpicture}%
+}
 \caption{Preprocessing pipeline for converting raw environments into binary occupancy grids.}
 \label{fig:preprocessing}
 \end{figure}
@@ -320,7 +464,75 @@ Figure~\ref{fig:strategy_flowchart} illustrates the strategy-selection logic.
 
 \begin{figure}[htb!]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering\vspace{2em}\textbf{TODO: Insert strategy-selection flowchart showing the decision logic for Base, Standard, and Predictive strategies.}\vspace{2em}}}
+\resizebox{0.92\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    node distance=0.8cm,
+    startend/.style={rectangle, draw, thick, fill=gray!10, minimum width=4.5cm, minimum height=0.75cm,
+                     rounded corners=10pt, font=\small\bfseries, align=center},
+    procbox/.style={rectangle, draw, thick, fill=blue!6, minimum width=4.5cm, minimum height=0.75cm,
+                    rounded corners=3pt, font=\small, align=center},
+    decision/.style={diamond, draw, thick, fill=yellow!10, aspect=2.8, font=\small, align=center,
+                     inner sep=2pt},
+    stratbox/.style={rectangle, draw, thick, fill=#1, minimum width=4.8cm, minimum height=1.4cm,
+                     rounded corners=4pt, font=\small, align=center},
+    arrow/.style={->, thick, >=Stealth},
+]
+
+% --- Start ---
+\node[startend] (start) {Input: Bresenham line $\mathcal{L}(s, g)$};
+
+% --- Scan ---
+\node[procbox, below=0.7cm of start] (scan) {Compute $\sigma(p)$ and $\nabla\sigma(p)$ for all $p \in \mathcal{L}$};
+
+% --- Decision 1 ---
+\node[decision, below=0.9cm of scan] (d1) {$\sigma(p) = 0$\\for all $p \in \mathcal{L}$?};
+
+% --- Base Strategy (right of d1) ---
+\node[stratbox=green!10, right=2.8cm of d1] (base) {\textbf{Strategy 1: Base}\\[2pt]\scriptsize Fixed-width corridor, radius $r_{\min}$\\[1pt]\scriptsize No per-point density computation};
+
+% --- Decision 2 ---
+\node[decision, below=1.2cm of d1] (d2) {$\max_{p} |\nabla\sigma(p)|$\\$< 0.1$?};
+
+% --- Standard Strategy (right of d2) ---
+\node[stratbox=cyan!10, right=2.8cm of d2] (standard) {\textbf{Strategy 2: Standard}\\[2pt]\scriptsize Density-adaptive radius via Eq.~\eqref{eq:radius_standard}\\[1pt]\scriptsize $r(p) = r_{\min} + \lfloor (r_{\max} - r_{\min}) \cdot \sigma(p)^{\alpha} \rfloor$};
+
+% --- Predictive Strategy ---
+\node[stratbox=violet!10, below=1.2cm of d2] (predictive) {\textbf{Strategy 3: Predictive}\\[2pt]\scriptsize Gradient-enhanced radius via Eq.~\eqref{eq:radius_gradient}\\[1pt]\scriptsize $r(p) = r_{\min} + \lfloor (r_{\max} - r_{\min}) \cdot (\sigma(p) + \beta\,|\nabla\sigma(p)|)^{\alpha} \rfloor$};
+
+% --- Build Corridor ---
+\node[procbox, fill=orange!8, below=1.0cm of predictive] (build) {Build adaptive corridor $\mathcal{C}_a$ using selected strategy};
+
+% --- End ---
+\node[startend, below=0.7cm of build] (endnode) {Proceed to constrained search};
+
+% --- Arrows ---
+\draw[arrow] (start) -- (scan);
+\draw[arrow] (scan) -- (d1);
+
+% Decision 1: Yes -> Base
+\draw[arrow] (d1.east) -- node[above, font=\scriptsize] {Yes} (base.west);
+
+% Decision 1: No -> Decision 2
+\draw[arrow] (d1.south) -- node[left, font=\scriptsize] {No} (d2.north);
+
+% Decision 2: Yes -> Standard
+\draw[arrow] (d2.east) -- node[above, font=\scriptsize] {Yes} (standard.west);
+
+% Decision 2: No -> Predictive
+\draw[arrow] (d2.south) -- node[left, font=\scriptsize] {No} (predictive.north);
+
+% Strategies to Build Corridor --- route through a shared vertical rail
+\coordinate (rail) at ([xshift=0.6cm]build.east);
+\draw[arrow] (base.south) |- (rail) -- ([yshift=0.15cm]build.east);
+\draw[arrow] (standard.south) |- (rail |- build.east) -- (build.east);
+\draw[arrow] (predictive.south) -- (build.north);
+
+% Build to End
+\draw[arrow] (build) -- (endnode);
+
+\end{tikzpicture}%
+}
 \caption{Flowchart of the AILS multi-strategy selection procedure. The strategy was determined by scanning obstacle density and its gradient along the Bresenham reference line.}
 \label{fig:strategy_flowchart}
 \end{figure}
@@ -579,7 +791,82 @@ Figure~\ref{fig:ails_architecture} illustrates the four-stage architecture.
 
 \begin{figure}[htb!]
 \centering
-\fbox{\parbox{0.85\textwidth}{\centering\vspace{2em}\textbf{TODO: Insert AILS four-stage architecture diagram showing: Bresenham Line $\to$ Density Estimation $\to$ Adaptive Corridor $\to$ Constrained Search (with fallback loop).}\vspace{2em}}}
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    node distance=0.5cm and 0.7cm,
+    inputbox/.style={rectangle, draw, thick, fill=gray!10, minimum width=2.8cm, minimum height=0.9cm,
+                     rounded corners=10pt, font=\small\bfseries, align=center},
+    stagebox/.style={rectangle, draw, thick, fill=#1, minimum width=3.2cm, minimum height=2.0cm,
+                     rounded corners=4pt, align=center},
+    stagetitle/.style={font=\small\bfseries, align=center},
+    stagedesc/.style={font=\scriptsize, align=center, text width=2.8cm},
+    decision/.style={diamond, draw, thick, fill=yellow!10, aspect=2.2, font=\small, align=center,
+                     inner sep=2pt},
+    outputbox/.style={rectangle, draw, thick, fill=green!10, minimum width=2.8cm, minimum height=0.9cm,
+                      rounded corners=10pt, font=\small\bfseries, align=center},
+    failbox/.style={rectangle, draw, thick, fill=red!8, minimum width=2.2cm, minimum height=0.7cm,
+                    rounded corners=3pt, font=\small, align=center},
+    arrow/.style={->, thick, >=Stealth},
+    darrow/.style={->, thick, >=Stealth, dashed, red!60!black},
+]
+
+% --- Input ---
+\node[inputbox] (input) {Input\\[-1pt]\scriptsize Grid $G$, start $s$, goal $g$};
+
+% --- Stage 1 ---
+\node[stagebox=blue!8, right=1.0cm of input] (s1) {};
+\node[stagetitle, anchor=north] at ([yshift=-0.15cm]s1.north) {Stage 1};
+\node[stagedesc, anchor=north] at ([yshift=-0.5cm]s1.north) {Reference-Line\\Generation\\[3pt]\scriptsize Bresenham line\\$\mathcal{L}(s, g)$};
+
+% --- Stage 2 ---
+\node[stagebox=cyan!8, right=0.7cm of s1] (s2) {};
+\node[stagetitle, anchor=north] at ([yshift=-0.15cm]s2.north) {Stage 2};
+\node[stagedesc, anchor=north] at ([yshift=-0.5cm]s2.north) {Density\\Estimation\\[3pt]\scriptsize $\sigma(p)$ via $O(1)$\\integral image};
+
+% --- Stage 3 ---
+\node[stagebox=violet!8, right=0.7cm of s2] (s3) {};
+\node[stagetitle, anchor=north] at ([yshift=-0.15cm]s3.north) {Stage 3};
+\node[stagedesc, anchor=north] at ([yshift=-0.5cm]s3.north) {Adaptive Corridor\\Construction\\[3pt]\scriptsize Per-point $r(p)$\\$\to \mathcal{C}_a$};
+
+% --- Stage 4 ---
+\node[stagebox=orange!8, right=0.7cm of s3] (s4) {};
+\node[stagetitle, anchor=north] at ([yshift=-0.15cm]s4.north) {Stage 4};
+\node[stagedesc, anchor=north] at ([yshift=-0.5cm]s4.north) {Constrained\\Search\\[3pt]\scriptsize Algorithm $\mathcal{A}$\\within $\mathcal{C}_a$};
+
+% --- Decision: Path found? ---
+\node[decision, right=1.0cm of s4] (dec) {Path\\found?};
+
+% --- Output ---
+\node[outputbox, above right=0.4cm and 1.2cm of dec] (output) {Output\\[-1pt]\scriptsize Path $\pi$};
+
+% --- Fallback ---
+\node[failbox, below right=0.4cm and 1.2cm of dec] (fallback) {Fallback:\\[-1pt]\scriptsize BFS Expansion\\$\mathcal{C}_a \gets \mathcal{C}_a'$};
+
+% --- Arrows: main flow ---
+\draw[arrow] (input) -- (s1);
+\draw[arrow] (s1) -- (s2);
+\draw[arrow] (s2) -- (s3);
+\draw[arrow] (s3) -- (s4);
+\draw[arrow] (s4) -- (dec);
+
+% --- Decision arrows ---
+\draw[arrow] (dec.north) |- node[pos=0.3, right, font=\scriptsize] {Yes} (output.west);
+\draw[arrow] (dec.south) |- node[pos=0.3, right, font=\scriptsize] {No} (fallback.west);
+
+% --- Fallback loop (dashed) back to Stage 4 ---
+\draw[darrow] (fallback.south) -- ++(0,-0.6cm) -| node[pos=0.25, below, font=\scriptsize\itshape, text=red!60!black] {Expand corridor, retry search} (s4.south);
+
+% --- Full grid check ---
+\node[failbox, fill=gray!15, right=1.0cm of fallback] (nopath) {No path in $G$};
+\draw[arrow] (fallback.east) -- node[above, font=\scriptsize] {$\mathcal{C}_a = V$} (nopath.west);
+
+% --- Strategy selection annotation ---
+\node[font=\scriptsize\itshape, text=violet!70!black, anchor=north] at ([yshift=-0.15cm]s3.south) {Strategy selection};
+\node[font=\scriptsize\itshape, text=violet!70!black, anchor=north] at ([yshift=-0.45cm]s3.south) {(Base / Standard / Predictive)};
+
+\end{tikzpicture}%
+}
 \caption{Architecture of the AILS planning pipeline. The four stages are executed sequentially; the fallback loop (dashed arrow) is invoked only when the initial constrained search fails.}
 \label{fig:ails_architecture}
 \end{figure}
