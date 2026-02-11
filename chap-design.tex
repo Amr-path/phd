@@ -224,14 +224,14 @@ Figure~\ref{fig:preprocessing} illustrates the preprocessing pipeline.
 \node[note, right=0.3cm of s7] {BFS from start to goal};
 
 % --- Step 8 (conditional) ---
-\node[condbox, below=0.75cm of s7] (cond) {AILS\\pipeline?};
+\node[condbox, below=0.85cm of s7] (cond) {AILS\\pipeline?};
 
-\node[stepbox, fill=violet!8, below right=0.6cm and 1.5cm of cond] (s8) {\textbf{Step 8:} Integral Image Computation};
+\node[stepbox, fill=violet!8, below right=0.7cm and 2.0cm of cond] (s8) {\textbf{Step 8:} Integral Image Computation};
 \node[note, right=0.3cm of s8] {Summed-area table; $O(|V|)$};
 
 % --- Step 9 ---
-\node[endbox, below=1.8cm of cond] (s9) {\textbf{Step 9:} Output};
-\node[note, right=0.3cm of s9] {Grid + start/goal + integral image};
+\node[endbox, below=2.2cm of cond] (s9) {\textbf{Step 9:} Output};
+\node[note, below=0.2cm of s9] {Grid + start/goal + integral image};
 
 % --- Arrows ---
 \draw[arrow] (s1) -- (s2);
@@ -243,8 +243,8 @@ Figure~\ref{fig:preprocessing} illustrates the preprocessing pipeline.
 \draw[arrow] (s7) -- (cond);
 
 % Conditional branches
-\draw[arrow] (cond.east) -- ++(0.5cm,0) |- node[pos=0.25, above, font=\scriptsize] {Yes} (s8.west);
-\draw[arrow] (s8.south) |- (s9.east);
+\draw[arrow] (cond.east) -- ++(0.8cm,0) |- node[pos=0.25, above, font=\scriptsize] {Yes} (s8.west);
+\draw[arrow] (s8.south) -- ++(0,-0.5cm) -| ([xshift=0.4cm]s9.east) -- (s9.east);
 \draw[arrow] (cond.south) -- node[left, font=\scriptsize] {No} (s9.north);
 
 \end{tikzpicture}%
@@ -474,8 +474,8 @@ Figure~\ref{fig:strategy_flowchart} illustrates the strategy-selection logic.
                     rounded corners=3pt, font=\small, align=center},
     decision/.style={diamond, draw, thick, fill=yellow!10, aspect=2.8, font=\small, align=center,
                      inner sep=2pt},
-    stratbox/.style={rectangle, draw, thick, fill=#1, minimum width=4.8cm, minimum height=1.4cm,
-                     rounded corners=4pt, font=\small, align=center},
+    stratbox/.style={rectangle, draw, thick, fill=#1, minimum width=5.5cm, minimum height=1.5cm,
+                     rounded corners=4pt, font=\small, align=center, inner sep=6pt},
     arrow/.style={->, thick, >=Stealth},
 ]
 
@@ -489,19 +489,19 @@ Figure~\ref{fig:strategy_flowchart} illustrates the strategy-selection logic.
 \node[decision, below=0.9cm of scan] (d1) {$\sigma(p) = 0$\\for all $p \in \mathcal{L}$?};
 
 % --- Base Strategy (right of d1) ---
-\node[stratbox=green!10, right=2.8cm of d1] (base) {\textbf{Strategy 1: Base}\\[2pt]\scriptsize Fixed-width corridor, radius $r_{\min}$\\[1pt]\scriptsize No per-point density computation};
+\node[stratbox=green!10, right=3.2cm of d1] (base) {\textbf{Strategy 1: Base}\\[2pt]\scriptsize Fixed-width corridor, radius $r_{\min}$\\[1pt]\scriptsize No per-point density computation};
 
 % --- Decision 2 ---
-\node[decision, below=1.2cm of d1] (d2) {$\max_{p} |\nabla\sigma(p)|$\\$< 0.1$?};
+\node[decision, below=1.4cm of d1] (d2) {$\max_{p} |\nabla\sigma(p)|$\\$< 0.1$?};
 
 % --- Standard Strategy (right of d2) ---
-\node[stratbox=cyan!10, right=2.8cm of d2] (standard) {\textbf{Strategy 2: Standard}\\[2pt]\scriptsize Density-adaptive radius via Eq.~\eqref{eq:radius_standard}\\[1pt]\scriptsize $r(p) = r_{\min} + \lfloor (r_{\max} - r_{\min}) \cdot \sigma(p)^{\alpha} \rfloor$};
+\node[stratbox=cyan!10, right=3.2cm of d2] (standard) {\textbf{Strategy 2: Standard}\\[2pt]\scriptsize Density-adaptive radius\\[1pt]\scriptsize $r(p) = r_{\min} + \lfloor (r_{\max} - r_{\min}) \cdot \sigma(p)^{\alpha} \rfloor$};
 
 % --- Predictive Strategy ---
-\node[stratbox=violet!10, below=1.2cm of d2] (predictive) {\textbf{Strategy 3: Predictive}\\[2pt]\scriptsize Gradient-enhanced radius via Eq.~\eqref{eq:radius_gradient}\\[1pt]\scriptsize $r(p) = r_{\min} + \lfloor (r_{\max} - r_{\min}) \cdot (\sigma(p) + \beta\,|\nabla\sigma(p)|)^{\alpha} \rfloor$};
+\node[stratbox=violet!10, below=1.4cm of d2] (predictive) {\textbf{Strategy 3: Predictive}\\[2pt]\scriptsize Gradient-enhanced radius\\[1pt]\scriptsize $r(p) = r_{\min} + \lfloor (r_{\max} - r_{\min}) \cdot (\sigma(p) + \beta\,|\nabla\sigma(p)|)^{\alpha} \rfloor$};
 
 % --- Build Corridor ---
-\node[procbox, fill=orange!8, below=1.0cm of predictive] (build) {Build adaptive corridor $\mathcal{C}_a$ using selected strategy};
+\node[procbox, fill=orange!8, below=1.2cm of predictive] (build) {Build adaptive corridor $\mathcal{C}_a$ using selected strategy};
 
 % --- End ---
 \node[startend, below=0.7cm of build] (endnode) {Proceed to constrained search};
@@ -522,10 +522,9 @@ Figure~\ref{fig:strategy_flowchart} illustrates the strategy-selection logic.
 % Decision 2: No -> Predictive
 \draw[arrow] (d2.south) -- node[left, font=\scriptsize] {No} (predictive.north);
 
-% Strategies to Build Corridor --- route through a shared vertical rail
-\coordinate (rail) at ([xshift=0.6cm]build.east);
-\draw[arrow] (base.south) |- (rail) -- ([yshift=0.15cm]build.east);
-\draw[arrow] (standard.south) |- (rail |- build.east) -- (build.east);
+% Strategies to Build Corridor --- route via right-side rail to avoid crossing boxes
+\draw[arrow] (base.east) -- ++(0.8cm,0) |- ([yshift=0.15cm]build.east);
+\draw[arrow] (standard.east) -- ++(0.4cm,0) |- ([yshift=-0.15cm]build.east);
 \draw[arrow] (predictive.south) -- (build.north);
 
 % Build to End
