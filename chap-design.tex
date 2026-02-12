@@ -1,6 +1,6 @@
 \chapter{METHODOLOGY}\label{chap:methodology}
 
-This chapter presents the research methodology adopted to investigate corridor-based pathfinding on grid maps. The chapter is organised as follows. Section~\ref{sec:meth_overview} provides an overview of the proposed research framework and its constituent pipelines. Section~\ref{sec:meth_data} describes the datasets and the preprocessing pipeline used to convert raw environments into binary grid representations. Section~\ref{sec:meth_components} formalises the fundamental algorithmic components shared across all pipelines. Section~\ref{sec:meth_adaptive} details the adaptive corridor construction and strategy-selection procedure central to the Adaptive Incremental Line Search (AILS). Section~\ref{sec:meth_ils_pipeline} presents the ILS-enhanced planning pipeline. Section~\ref{sec:meth_baseline_pipeline} describes the baseline planner pipeline used for comparative evaluation. Section~\ref{sec:meth_ails_pipeline} presents the Adaptive ILS planning pipeline. Section~\ref{sec:meth_metrics} defines the evaluation metrics and experimental protocol. Section~\ref{sec:meth_summary} summarises the chapter and previews the implementation described in Chapter~\ref{chap:implementation}.
+This chapter presents the research methodology adopted to investigate corridor-based pathfinding on grid maps. The chapter is organised as follows. Section~\ref{sec:meth_overview} provides an overview of the proposed research framework and its constituent pipelines. Section~\ref{sec:meth_data} describes the datasets and the preprocessing pipeline used to convert raw environments into binary grid representations. Section~\ref{sec:meth_components} formalises the fundamental algorithmic components shared across all pipelines. Section~\ref{sec:meth_adaptive} details the adaptive corridor construction and strategy-selection procedure central to the Adaptive Incremental Line Search (AILS). Section~\ref{sec:meth_ils_pipeline} presents the ILS-enhanced planning pipeline. Section~\ref{sec:meth_baseline_pipeline} describes the baseline planner pipeline used for comparative evaluation. Section~\ref{sec:meth_ails_pipeline} presents the Adaptive ILS planning pipeline. Section~\ref{sec:meth_metrics} defines the evaluation metrics and experimental protocol. Section~\ref{sec:meth_summary} summarises the chapter and previews the implementation described in Chapter~\ref{chap:pipeline}.
 
 
 %======================================================================
@@ -101,7 +101,7 @@ The four pipelines were defined as follows:
 
 \item \textbf{Adaptive ILS Planning Pipeline.} This pipeline extended the ILS approach by introducing per-point density estimation via integral images and a variable-width corridor whose radius at each reference-line cell was a closed-form function of the local obstacle density. Three corridor strategies---Base, Standard, and Predictive---were provided and selected automatically. The pipeline is detailed in Section~\ref{sec:meth_ails_pipeline}.
 
-\item \textbf{Planning-to-Flight Pipeline.} This pipeline deployed the pathfinding algorithms on an autonomous drone platform via DroneKit and ROS/MAVROS integration with ArduPilot. The implementation details and flight procedures are deferred to Chapter~\ref{chap:implementation}, as they pertain to system integration rather than algorithmic methodology.
+\item \textbf{Planning-to-Flight Pipeline.} This pipeline deployed the pathfinding algorithms on an autonomous drone platform via DroneKit and ROS/MAVROS integration with ArduPilot. The implementation details and flight procedures are deferred to Chapter~\ref{chap:pipeline}, as they pertain to system integration rather than algorithmic methodology.
 
 \end{enumerate}
 
@@ -161,7 +161,7 @@ All grid maps, whether synthetically generated or derived from imagery, underwen
 
 \item \textbf{Binary Thresholding.} Each pixel was classified as either traversable ($\text{value} \geq 128$) or obstacle ($\text{value} < 128$) using a fixed threshold of 128. This threshold was applied uniformly across all image-derived grids.
 
-\item \textbf{Grid Construction.} The binary image was mapped to an occupancy grid $G = (V, E, w)$, where each pixel corresponded to one vertex $v \in V$, and edges connected each vertex to its valid neighbours under the chosen connectivity model (8-connected for DS1--DS3; 4-connected for the drone implementation described in Chapter~\ref{chap:implementation}).
+\item \textbf{Grid Construction.} The binary image was mapped to an occupancy grid $G = (V, E, w)$, where each pixel corresponded to one vertex $v \in V$, and edges connected each vertex to its valid neighbours under the chosen connectivity model (8-connected for DS1--DS3; 4-connected for the drone implementation described in Chapter~\ref{chap:pipeline}).
 
 \item \textbf{Obstacle Density Verification.} For synthetic grids (DS1--DS3), the actual obstacle density of each generated map was verified against the target density. Maps whose actual density deviated by more than 1\% from the target were regenerated.
 
@@ -298,7 +298,7 @@ w(v, v') =
 \end{cases}
 \end{equation}
 
-\textbf{4-Connected Grid (Drone Implementation).} For the drone-based planning pipeline (Chapter~\ref{chap:implementation}), each non-boundary vertex had up to four cardinal neighbours, and all edge costs were uniform:
+\textbf{4-Connected Grid (Drone Implementation).} For the drone-based planning pipeline (Chapter~\ref{chap:pipeline}), each non-boundary vertex had up to four cardinal neighbours, and all edge costs were uniform:
 \begin{equation}\label{eq:cost_4conn}
 w(v, v') = 1 \quad \text{for all cardinal moves}.
 \end{equation}
@@ -912,7 +912,7 @@ $|\nabla \sigma|$ threshold & 0.1 & Gradient threshold for strategy selection (B
 \end{tabular}
 \end{table}
 
-These defaults were adopted from the AILS study \citep{Elshahed2025AILS}. In the AILS experiments, parameter sensitivity was assessed by systematically varying $r_{\min}$, $r_{\max}$, $\alpha$, and $\omega$ while holding other parameters at their defaults (see Chapter~\ref{chap:discussion}).
+These defaults were adopted from the AILS study \citep{Elshahed2025AILS}. In the AILS experiments, parameter sensitivity was assessed by systematically varying $r_{\min}$, $r_{\max}$, $\alpha$, and $\omega$ while holding other parameters at their defaults (see Chapter~\ref{chap:results}).
 
 
 %======================================================================
@@ -996,7 +996,7 @@ Two hardware configurations were used across the studies:
 \end{tabular}
 \end{table}
 
-The drone-based experiments (Pipeline~4) used an identical software environment to the AILS study (Python~3.10 on Ubuntu~22.04~LTS) running on the same Intel Core i7-12700K workstation, with ArduPilot SITL executing locally. The hardware configuration for the drone flight controller and communication interface is described in Chapter~\ref{chap:implementation}.
+The drone-based experiments (Pipeline~4) used an identical software environment to the AILS study (Python~3.10 on Ubuntu~22.04~LTS) running on the same Intel Core i7-12700K workstation, with ArduPilot SITL executing locally. The hardware configuration for the drone flight controller and communication interface is described in Chapter~\ref{chap:pipeline}.
 
 The use of different hardware platforms across the two studies meant that absolute execution times were not directly comparable between the ILS and AILS experiments. Relative metrics (percentage improvement, node reduction, corridor efficiency) were hardware-independent and were used for cross-study comparisons.
 
@@ -1017,4 +1017,4 @@ Sections~\ref{sec:meth_ils_pipeline}--\ref{sec:meth_ails_pipeline} presented the
 
 Section~\ref{sec:meth_metrics} defined eight evaluation metrics and an experimental protocol incorporating paired $t$-tests, Cohen's $d$ effect sizes, Shapiro--Wilk normality checks, and ANOVA with Tukey HSD correction.
 
-Chapter~\ref{chap:implementation} describes the software implementation of the framework, including the Python codebase, the drone integration via DroneKit and ROS/MAVROS, and the experimental execution environment.
+Chapter~\ref{chap:pipeline} describes the software implementation of the framework, including the Python codebase, the drone integration via DroneKit and ROS/MAVROS, and the experimental execution environment.
