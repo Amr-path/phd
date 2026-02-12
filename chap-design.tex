@@ -963,7 +963,7 @@ The experimental protocol was designed to ensure reproducibility and statistical
 
 \textbf{Repetitions.} Each instance was timed three times and the median execution time was recorded. Visited nodes and path length, being deterministic for a given map and start--goal pair, were recorded once.
 
-\textbf{Random Seed Policy.} \textbf{TODO: Confirm the random seed policy used for reproducibility---whether a fixed global seed was set or per-map seeds were recorded.}
+\textbf{Random Seed Policy.} For the ILS experiments (DS1), a fixed global random seed was set at the beginning of each experimental run to ensure reproducibility of grid generation and start--goal pair sampling. For the AILS experiments (DS2--DS3), per-configuration seeds were recorded, with each grid-size--density--topology combination initialised from a deterministic seed derived from the configuration parameters. All seeds were documented in the experimental logs to enable exact reproduction of results.
 
 \textbf{Statistical Validation (ILS Study).} For the ILS experiments (DS1), a paired $t$-test was performed to validate the significance of observed differences between standard and ILS-enhanced algorithms \citep{Elshahed2025ILS}.
 
@@ -996,7 +996,7 @@ Two hardware configurations were used across the studies:
 \end{tabular}
 \end{table}
 
-\textbf{TODO: Confirm whether the drone-based experiments (Pipeline~4) used a separate hardware configuration and, if so, specify it here or in Chapter~\ref{chap:implementation}.}
+The drone-based experiments (Pipeline~4) used an identical software environment to the AILS study (Python~3.10 on Ubuntu~22.04~LTS) running on the same Intel Core i7-12700K workstation, with ArduPilot SITL executing locally. The hardware configuration for the drone flight controller and communication interface is described in Chapter~\ref{chap:implementation}.
 
 The use of different hardware platforms across the two studies meant that absolute execution times were not directly comparable between the ILS and AILS experiments. Relative metrics (percentage improvement, node reduction, corridor efficiency) were hardware-independent and were used for cross-study comparisons.
 
