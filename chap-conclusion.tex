@@ -1,21 +1,21 @@
 \chapter{RESULTS AND DISCUSSION}\label{chap:results}
 
-This chapter presents the experimental results obtained from the three algorithmic pipelines defined in Chapter~\ref{chap:methodology}. The chapter is organised as follows. Section~\ref{sec:res_ils} reports the results of the ILS-enhanced planning pipeline (Pipeline~2) evaluated on DS1 and DS4. Section~\ref{sec:res_ails} reports the results of the AILS planning pipeline (Pipeline~3) evaluated on DS2 and DS3. Section~\ref{sec:res_ablation} presents the ablation study examining the sensitivity of AILS to its corridor parameters. Section~\ref{sec:res_discussion} provides a cross-study discussion that synthesises the findings from both studies and addresses the research questions posed in Chapter~\ref{chap:intro}. Section~\ref{sec:res_summary} summarises the chapter.
+This chapter presents the experimental results obtained from the three algorithmic pipelines defined in Chapter~\ref{chap:methodology}. Section~\ref{sec:res_ils} reports the ILS-enhanced planning pipeline (Pipeline~2) results on DS1 and DS4. Section~\ref{sec:res_ails} covers the AILS pipeline (Pipeline~3) evaluated on DS2 and DS3. Section~\ref{sec:res_ablation} presents the ablation study examining how sensitive AILS is to its corridor parameters. Section~\ref{sec:res_discussion} pulls together the findings from both studies in a cross-study discussion and addresses the research questions posed in Chapter~\ref{chap:intro}. Section~\ref{sec:res_summary} wraps up the chapter.
 
-All numerical results, tables, and figures in this chapter are reported exactly as measured; no post-hoc adjustments have been applied. Unless stated otherwise, execution times are wall-clock times in milliseconds, path lengths are cumulative edge costs, and visited nodes are vertices popped from the open list (or equivalent data structure).
+All numerical results, tables, and figures reported here reflect the raw measurements; no post-hoc adjustments have been applied. Unless stated otherwise, execution times are wall-clock times in milliseconds, path lengths are cumulative edge costs, and visited nodes are vertices popped from the open list (or equivalent data structure).
 
 
 %======================================================================
 \section{ILS Experimental Results}\label{sec:res_ils}
 %======================================================================
 
-This section presents the results of the ILS-enhanced planning pipeline (Pipeline~2) compared against the unconstrained baseline pipeline (Pipeline~1). All experiments in this section used DS1 (6{,}000 synthetic $200 \times 200$ grids at obstacle densities of 10\%, 20\%, and 30\%) and DS4 (satellite-derived grid). Five classical algorithms---A*, Dijkstra, BFS, DFS, and Greedy Best-First Search---were evaluated in both their standard and ILS-enhanced forms. Results were averaged over 2{,}000 maps per density level \citep{Elshahed2025ILS}.
+This section presents the results of the ILS-enhanced planning pipeline (Pipeline~2) compared against the unconstrained baseline pipeline (Pipeline~1). All experiments here used DS1 (6{,}000 synthetic $200 \times 200$ grids at obstacle densities of 10\%, 20\%, and 30\%) and DS4 (satellite-derived grid). Five classical algorithms---A*, Dijkstra, BFS, DFS, and Greedy Best-First Search---were tested in both their standard and ILS-enhanced forms, with results averaged over 2{,}000 maps per density level \citep{Elshahed2025ILS}.
 
 %----------------------------------------------------------------------
 \subsection{Execution Time Analysis}\label{subsec:res_ils_time}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ils_exec_time} presents the average execution time for each algorithm in its standard and ILS-enhanced configurations across the three obstacle densities. Percentage improvements were computed using Equation~\eqref{eq:improvement}.
+Table~\ref{tab:ils_exec_time} shows the average execution time for each algorithm in its standard and ILS-enhanced configurations across the three obstacle densities. Percentage improvements were computed using Equation~\eqref{eq:improvement}.
 
 \begin{table}[htb!]
 \centering
@@ -36,17 +36,17 @@ Best-First      & -- & 95.52 & -- & 94.29 & -- & 84.55 \\
 \end{tabular}
 \end{table}
 
-ILS achieved substantial reductions in execution time across all algorithms and all obstacle densities. The highest reductions were observed at 10\% density, where A* achieved a 94.81\% reduction and Best-First Search achieved the overall highest reduction of 95.52\%. As obstacle density increased from 10\% to 30\%, the magnitude of improvement decreased---A* dropped from 94.81\% to 82.77\%, and Best-First Search from 95.52\% to 84.55\%---but remained above 80\% for A*, DFS, and Best-First Search even at 30\% density. BFS and Dijkstra maintained reductions above 60\% across all densities.
+ILS delivered substantial execution-time reductions across all algorithms and density levels. The largest gains showed up at 10\% density, where A* achieved a 94.81\% reduction and Best-First Search reached 95.52\%---the highest single value recorded. As obstacle density climbed from 10\% to 30\%, the improvements tapered off (A* dropped from 94.81\% to 82.77\%, Best-First from 95.52\% to 84.55\%), yet they stayed above 80\% for A*, DFS, and Best-First Search even at 30\% density. BFS and Dijkstra maintained reductions above 60\% throughout.
 
-The reduction in execution time with increasing density was expected: denser obstacle configurations required wider corridor expansions before a feasible path was found, thereby reducing the search-space savings relative to unconstrained search. Nevertheless, ILS maintained meaningful speedups even in the densest scenario tested.
+This density-dependent pattern was expected: denser obstacle layouts forced wider corridor expansions before a feasible path could be found, which ate into the search-space savings relative to unconstrained search. Even so, ILS maintained meaningful speedups across the board.
 
-On average across all algorithms and all density levels, ILS achieved an 87.31\% reduction in execution time \citep{Elshahed2025ILS}. Best-First Search recorded the highest single-algorithm average at 91.45\%, followed by A* at 90.34\%.
+Averaging over all algorithms and density levels, ILS cut execution time by 87.31\% \citep{Elshahed2025ILS}. Best-First Search recorded the highest single-algorithm average at 91.45\%, followed by A* at 90.34\%.
 
 %----------------------------------------------------------------------
 \subsection{Visited Nodes Analysis}\label{subsec:res_ils_nodes}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ils_visited_nodes} presents the percentage reduction in visited nodes achieved by ILS for each algorithm across the three density levels.
+Table~\ref{tab:ils_visited_nodes} shows the percentage reduction in visited nodes achieved by ILS for each algorithm across the three density levels.
 
 \begin{table}[htb!]
 \centering
@@ -67,50 +67,50 @@ Best-First      & 58--78 & 58--78 & 58--78 & -- \\
 \end{tabular}
 \end{table}
 
-ILS significantly reduced the number of nodes visited during search. The average reduction across all algorithms and densities was 71.44\%. DFS and BFS demonstrated the largest individual reductions, achieving up to 78\% fewer visited nodes at 10\% density. A*, Dijkstra, and Best-First Search consistently reduced explored nodes by 58--78\% across all densities.
+ILS cut the number of nodes visited during search by a wide margin. On average across all algorithms and densities, the reduction was 71.44\%. DFS and BFS saw the largest individual drops---up to 78\% fewer visited nodes at 10\% density---while A*, Dijkstra, and Best-First Search consistently trimmed explored nodes by 58--78\% across all densities.
 
-The node-reduction benefit was most pronounced in sparse environments (10\% density), where the corridor covered a small fraction of the grid and contained few obstacles requiring expansion. As density increased, more corridor expansions were triggered, admitting additional cells into the search region and reducing the net savings. Nevertheless, all algorithms maintained reductions above 58\% even at 30\% density.
+The benefit was most pronounced in sparse environments (10\% density), where the corridor covered only a small fraction of the grid and contained few obstacles that would trigger expansion. As density rose, more corridor expansions were triggered, which admitted additional cells into the search region and reduced the net savings. Even so, every algorithm maintained reductions above 58\% at 30\% density.
 
-The average visited-node reduction of 73.7\% across all algorithms further confirmed that the corridor-based restriction effectively limited the search space \citep{Elshahed2025ILS}.
+The 73.7\% average reduction in visited nodes across all algorithms further confirmed that corridor-based restriction was effective at limiting the search space \citep{Elshahed2025ILS}.
 
 %----------------------------------------------------------------------
 \subsection{Path Length and Optimality}\label{subsec:res_ils_path}
 %----------------------------------------------------------------------
 
-The path length results revealed an important distinction between optimal and non-optimal algorithms when integrated with ILS.
+The path-length results revealed an important split between optimal and non-optimal algorithms when paired with ILS.
 
-\textbf{Optimal algorithms (A*, Dijkstra, BFS).} BFS and Dijkstra retained the same discrete grid path lengths as their unconstrained counterparts, confirming that the corridor-based restriction did not compromise optimality for these algorithms on uniform-cost grids. A* with ILS integration produced paths with improved Euclidean path length (69.54--86.37\% improvement), attributable to the Theta*-style line-of-sight post-processing that permitted any-angle shortcuts within the corridor. The discrete path cost remained optimal.
+\textbf{Optimal algorithms (A*, Dijkstra, BFS).} BFS and Dijkstra retained the same discrete grid path lengths as their unconstrained counterparts, confirming that the corridor did not compromise optimality on uniform-cost grids. A* with ILS produced paths with improved Euclidean path length (69.54--86.37\% improvement), thanks to the Theta*-style line-of-sight post-processing that permitted any-angle shortcuts within the corridor. The underlying discrete path cost remained optimal.
 
-\textbf{Non-optimal algorithms (DFS, Best-First Search).} DFS exhibited the most dramatic path length improvement, with reductions of up to 93.74\%. The corridor constraint fundamentally altered the behaviour of DFS: rather than pursuing arbitrarily deep explorations across the full grid, DFS was confined to a narrow band around the direct line between start and goal, producing paths that were orders of magnitude shorter than unconstrained DFS. Best-First Search achieved an average path length improvement of 63.24\% across all densities, with a peak of 70.95\% at 10\% density \citep{Elshahed2025ILS}.
+\textbf{Non-optimal algorithms (DFS, Best-First Search).} DFS showed the most dramatic path-length improvement, with reductions of up to 93.74\%. The corridor fundamentally changed how DFS behaved: rather than chasing arbitrarily deep branches across the full grid, DFS was funnelled into a narrow band around the direct line between start and goal, producing paths that were orders of magnitude shorter than unconstrained DFS. Best-First Search improved by an average of 63.24\% across all densities, peaking at 70.95\% at 10\% density \citep{Elshahed2025ILS}.
 
-These results demonstrated that ILS not only reduced computational cost but also improved path quality for algorithms that do not guarantee optimality. The corridor served as an implicit guide that prevented non-optimal algorithms from generating excessively long detours.
+These findings demonstrated that ILS did more than just speed things up---it also improved path quality for algorithms that do not guarantee optimality. The corridor acted as an implicit guide, preventing non-optimal algorithms from generating excessively long detours.
 
 %----------------------------------------------------------------------
 \subsection{Statistical Validation}\label{subsec:res_ils_stat}
 %----------------------------------------------------------------------
 
-A paired $t$-test was performed to validate the significance of the observed differences between standard and ILS-enhanced algorithms for each metric \citep{Elshahed2025ILS}. The test compared the paired values (standard metric value, ILS metric value) across the 2{,}000 maps at each density level. The results confirmed that the improvements in execution time, visited nodes, and path length were statistically significant ($p < 0.05$) for all algorithm--density combinations.
+Paired $t$-tests confirmed that the improvements in execution time, visited nodes, and path length were statistically significant ($p < 0.05$) for every algorithm--density combination \citep{Elshahed2025ILS}. Each test compared the paired values (standard metric, ILS metric) across the 2{,}000 maps at each density level.
 
 %----------------------------------------------------------------------
 \subsection{Real-World Satellite Data (DS4)}\label{subsec:res_ils_satellite}
 %----------------------------------------------------------------------
 
-To assess the applicability of ILS beyond synthetic grids, the algorithms were evaluated on a real-world grid derived from a satellite image at coordinates $(5.31361,\; 100.26908)$. The satellite image was converted into a binary occupancy grid using the preprocessing pipeline described in Section~\ref{sec:meth_data}.
+To see whether ILS held up outside the controlled conditions of synthetic grids, the algorithms were also evaluated on a real-world grid derived from a satellite image at coordinates $(5.31361,\; 100.26908)$. The satellite image was converted into a binary occupancy grid through the preprocessing pipeline described in Section~\ref{sec:meth_data}.
 
-The results on the satellite-derived grid were consistent with the synthetic experiments: ILS-enhanced algorithms demonstrated significant reductions in execution time and visited nodes compared to their standard counterparts, with minimal impact on path length. The satellite grid featured a complex, non-uniform obstacle distribution that differed substantially from the controlled synthetic patterns, yet ILS maintained its effectiveness. This provided initial evidence that the corridor-based approach generalised beyond the controlled conditions of DS1 to more realistic environments \citep{Elshahed2025ILS}.
+The results were reassuring: ILS-enhanced algorithms delivered significant reductions in execution time and visited nodes compared to their standard counterparts, with minimal impact on path length. The satellite grid featured a complex, non-uniform obstacle distribution that looked nothing like the controlled synthetic patterns, yet ILS maintained its effectiveness. This provided initial evidence that the corridor-based approach generalised beyond the controlled conditions of DS1 to more realistic settings \citep{Elshahed2025ILS}.
 
 
 %======================================================================
 \section{AILS Experimental Results}\label{sec:res_ails}
 %======================================================================
 
-This section presents the results of the AILS planning pipeline (Pipeline~3) evaluated on DS2 and DS3. The experiments used grids from $50 \times 50$ to $500 \times 500$, obstacle densities from 10\% to 40\%, and five obstacle topologies (Random, Clustered, Maze, Room, Open). Two AILS configurations were tested: AILS-Base (fixed-width corridor, $r(p) = r_{\min}$ for all $p$) and AILS-Adaptive (density-adaptive corridor, Equation~\eqref{eq:radius_standard}). Both used A* as the internal search algorithm. For each configuration, 100--200 random start--goal pairs were evaluated \citep{Elshahed2025AILS}.
+This section presents the results of the AILS planning pipeline (Pipeline~3) on DS2 and DS3. Grids ranged from $50 \times 50$ to $500 \times 500$, obstacle densities from 10\% to 40\%, and five obstacle topologies (Random, Clustered, Maze, Room, Open). Two AILS configurations were tested: AILS-Base (fixed-width corridor, $r(p) = r_{\min}$ for all $p$) and AILS-Adaptive (density-adaptive corridor, Equation~\eqref{eq:radius_standard}). Both used A* as the internal search algorithm. For each configuration, 100--200 random start--goal pairs were evaluated \citep{Elshahed2025AILS}.
 
 %----------------------------------------------------------------------
 \subsection{Overall Performance Comparison}\label{subsec:res_ails_overall}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ails_descriptive} presents the descriptive statistics for all algorithms on $200 \times 200$ grids with 25\% random-obstacle density.
+Table~\ref{tab:ails_descriptive} presents descriptive statistics for all algorithms on $200 \times 200$ grids with 25\% random-obstacle density.
 
 \begin{table}[htb!]
 \centering
@@ -130,9 +130,9 @@ AILS-Adaptive       & 1{,}081.7 & 683.4 & 25.12 & 98.0\% \\
 \end{tabular}
 \end{table}
 
-Both AILS variants substantially reduced node expansion relative to A*: AILS-Base explored 56.0\% fewer nodes and AILS-Adaptive explored 51.4\% fewer nodes. All algorithms achieved the same 98.0\% success rate; the 2\% failures corresponded to instances where the generated obstacle configuration blocked every path from start to goal.
+Both AILS variants cut node expansion sharply compared to A*: AILS-Base explored 56.0\% fewer nodes and AILS-Adaptive explored 51.4\% fewer. Every algorithm achieved the same 98.0\% success rate; the 2\% failures corresponded to instances where obstacles blocked every path between start and goal.
 
-Table~\ref{tab:ails_comprehensive} presents the comprehensive comparison with 200 random start--goal pairs.
+Table~\ref{tab:ails_comprehensive} gives the comprehensive comparison with 200 random start--goal pairs.
 
 \begin{table}[htb!]
 \centering
@@ -152,15 +152,15 @@ AILS-Adaptive       & 47.90 & 62.95 & 1{,}148 & 99.0\% \\
 \end{tabular}
 \end{table}
 
-AILS-Base achieved the lowest mean node count (1{,}013), representing a 56.9\% reduction relative to A*. AILS-Adaptive achieved a 51.1\% node reduction with lower variance across instances (standard deviation of 62.95~ms vs.\ 79.34~ms for AILS-Base). Dijkstra and BFS expanded approximately $6.5\times$ more nodes than A*, confirming the value of heuristic guidance.
+AILS-Base achieved the lowest mean node count (1{,}013)---a 56.9\% reduction relative to A*. AILS-Adaptive achieved 51.1\% node reduction with lower variance across instances (standard deviation of 62.95~ms vs.\ 79.34~ms for AILS-Base). Dijkstra and BFS expanded roughly $6.5\times$ more nodes than A*, underscoring the value of heuristic guidance.
 
-Notably, the AILS variants had higher mean execution time than A* at this grid size (48--49~ms vs.\ 31~ms). This was because the corridor-construction overhead---integral-image computation, density estimation, and corridor cell-set assembly---had not yet been amortised by the search-space savings. As shown in Section~\ref{subsec:res_ails_scalability}, time-competitiveness emerged at $300 \times 300$ and above.
+It is worth noting that the AILS variants had higher mean execution time than A* at this grid size (48--49~ms vs.\ 31~ms). The corridor-construction overhead---integral-image computation, density estimation, corridor cell-set assembly---had not yet been amortised by the search-space savings at this scale. As Section~\ref{subsec:res_ails_scalability} shows, time-competitiveness emerged at $300 \times 300$ and above.
 
 %----------------------------------------------------------------------
 \subsection{Statistical Significance Analysis}\label{subsec:res_ails_stats}
 %----------------------------------------------------------------------
 
-\textbf{Normality verification.} Prior to conducting paired $t$-tests, Shapiro--Wilk tests were applied to the paired differences (A* nodes $-$ AILS nodes) for each comparison. Both comparisons yielded $W > 0.97$ with $p > 0.10$, confirming that the paired differences were consistent with a normal distribution and that the paired $t$-test was appropriate.
+\textbf{Normality verification.} Before running paired $t$-tests, Shapiro--Wilk tests were applied to the paired differences (A* nodes $-$ AILS nodes) for each comparison. Both yielded $W > 0.97$ with $p > 0.10$, confirming that the paired differences were consistent with a normal distribution and that parametric testing was appropriate.
 
 \textbf{Paired $t$-tests.} Table~\ref{tab:ails_significance} presents the paired $t$-test results comparing AILS variants against standard A* for node exploration on $200 \times 200$ grids at 25\% density.
 
@@ -178,7 +178,7 @@ A* vs.\ AILS-Adaptive   & 11.26 & $5.75 \times 10^{-23}$ & 0.76 & Medium--Large 
 \end{tabular}
 \end{table}
 
-Both comparisons were highly significant ($p < 0.001$). The effect sizes---$d = 0.82$ (large) for AILS-Base and $d = 0.76$ (medium-to-large) for AILS-Adaptive---indicated that the node-reduction differences were not only statistically significant but also practically meaningful \citep{Elshahed2025AILS}.
+Both comparisons were highly significant ($p < 0.001$). The effect sizes---$d = 0.82$ (large) for AILS-Base and $d = 0.76$ (medium-to-large) for AILS-Adaptive---showed that the node-reduction differences were not just statistically significant but practically meaningful as well \citep{Elshahed2025AILS}.
 
 \textbf{Additional effect sizes.} Cohen's $d$ values for other pairwise comparisons were:
 \begin{itemize}
@@ -187,13 +187,13 @@ Both comparisons were highly significant ($p < 0.001$). The effect sizes---$d = 
 \item A* vs.\ Bidirectional A* (nodes): $d = -0.76$ (medium effect; Bidirectional A* expanded more nodes).
 \end{itemize}
 
-Positive $d$ values indicated that AILS explored fewer nodes than A*; negative values for the Dijkstra and BFS comparisons confirmed the expected benefit of heuristic guidance. Importantly, a large node-reduction effect did not by itself imply a wall-clock speedup, because corridor construction introduced fixed overhead that must be amortised by the search-space savings.
+Positive $d$ values indicated that AILS explored fewer nodes than A*; negative values for the Dijkstra and BFS comparisons confirmed the expected benefit of heuristic guidance. A large node-reduction effect did not by itself imply a wall-clock speedup, because corridor construction introduced fixed overhead that must be amortised by the search-space savings.
 
 %----------------------------------------------------------------------
 \subsection{Scalability Analysis}\label{subsec:res_ails_scalability}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ails_scalability} presents the performance of A* and AILS-Adaptive across grid sizes from $50 \times 50$ to $500 \times 500$ at 25\% random-obstacle density.
+Table~\ref{tab:ails_scalability} presents how A* and AILS-Adaptive performed across grid sizes from $50 \times 50$ to $500 \times 500$ at 25\% random-obstacle density.
 
 \begin{table}[htb!]
 \centering
@@ -217,19 +217,19 @@ $500 \times 500$   & 124.76 & 17{,}016 & 129.94 & 3{,}945 & 76.8 \\
 \end{tabular}
 \end{table}
 
-The scalability results revealed two key findings:
+Two key findings emerged from the scalability analysis:
 
-\textbf{Finding 1: Node reduction scaled positively with grid size.} The percentage of nodes saved by AILS-Adaptive increased monotonically from 5.1\% on $50 \times 50$ grids to 76.8\% on $500 \times 500$ grids. This scaling behaviour was expected: on larger grids, the ratio of corridor area to total grid area decreased, because the corridor width was bounded by $r_{\max} = \lceil 0.1 \cdot \min(H, W) \rceil$ while the total grid area grew quadratically. Consequently, the fraction of nodes excluded by the corridor constraint increased with grid size.
+\textbf{Finding 1: Node reduction scaled up with grid size.} The percentage of nodes saved by AILS-Adaptive grew steadily from 5.1\% on $50 \times 50$ grids to 76.8\% on $500 \times 500$ grids. This makes sense: on larger grids, the corridor occupied an ever-shrinking fraction of the total area, because corridor width was capped by $r_{\max} = \lceil 0.1 \cdot \min(H, W) \rceil$ while total grid area grew quadratically.
 
-\textbf{Finding 2: A time-efficiency crossover occurred near $300 \times 300$.} On grids smaller than approximately $300 \times 300$, the corridor-construction overhead (integral-image computation, per-point density estimation, corridor cell-set assembly) exceeded the search-space savings, making AILS-Adaptive slower than A* in wall-clock time despite exploring substantially fewer nodes. At $300 \times 300$, AILS-Adaptive became time-competitive: it reduced mean execution time by 6.3\% (29.61~ms vs.\ 31.62~ms) while exploring 65.5\% fewer nodes. On $400 \times 400$ and $500 \times 500$ grids, the time differences narrowed further, and the node-reduction advantage continued to grow \citep{Elshahed2025AILS}.
+\textbf{Finding 2: A time-efficiency crossover emerged near $300 \times 300$.} On grids smaller than roughly $300 \times 300$, the corridor-construction overhead (integral-image computation, per-point density estimation, corridor cell-set assembly) outweighed the search-space savings, leaving AILS-Adaptive slower than A* in wall-clock time despite exploring far fewer nodes. At $300 \times 300$, AILS-Adaptive pulled ahead: it trimmed mean execution time by 6.3\% (29.61~ms vs.\ 31.62~ms) while exploring 65.5\% fewer nodes. On $400 \times 400$ and $500 \times 500$ grids the time gap narrowed further, and the node-reduction advantage kept growing \citep{Elshahed2025AILS}.
 
-The crossover point was implementation-dependent. The Python implementation used in these experiments incurred relatively high overhead for hash-set operations and integral-image queries. A C++ implementation would likely lower the crossover point substantially, enabling time-competitive performance on smaller grids.
+The crossover point depends on the implementation. The Python code used here incurred relatively high overhead for hash-set operations and integral-image queries; a C++ implementation would likely push the crossover to smaller grids.
 
 %----------------------------------------------------------------------
 \subsection{Density Impact Analysis}\label{subsec:res_ails_density}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ails_density} presents the performance of A* and AILS-Base across obstacle densities from 10\% to 40\% on $200 \times 200$ grids.
+Table~\ref{tab:ails_density} shows how A* and AILS-Base performed across obstacle densities from 10\% to 40\% on $200 \times 200$ grids.
 
 \begin{table}[htb!]
 \centering
@@ -254,19 +254,19 @@ Table~\ref{tab:ails_density} presents the performance of A* and AILS-Base across
 
 The density analysis revealed three distinct regimes:
 
-\textbf{Low density (10--20\%):} AILS-Base achieved both time and node reduction relative to A*. At 10\% density, AILS-Base was faster (8.57~ms vs.\ 9.20~ms) and explored 43.1\% fewer nodes. At 20\%, AILS-Base was 29.6\% faster (8.57~ms vs.\ 12.18~ms) and explored 57.4\% fewer nodes. In this regime, the corridor was rarely expanded, and the corridor-construction overhead was fully amortised by the search savings.
+\textbf{Low density (10--20\%):} AILS-Base beat A* on both time and node count. At 10\% density it was faster (8.57~ms vs.\ 9.20~ms) and explored 43.1\% fewer nodes. At 20\% it was 29.6\% faster (8.57~ms vs.\ 12.18~ms) with 57.4\% fewer nodes. In this regime the corridor was rarely expanded, and the construction overhead paid for itself through search savings.
 
-\textbf{Moderate density (25--30\%):} AILS-Base maintained strong node reduction (58.0\% at 25\%, 49.0\% at 30\%) but corridor-construction overhead raised execution time above A*. At 25\% density, AILS-Base took 20.88~ms vs.\ 15.58~ms for A*. At 30\%, the gap widened to 68.14~ms vs.\ 18.61~ms due to more frequent corridor expansions.
+\textbf{Moderate density (25--30\%):} AILS-Base still achieved strong node reduction (58.0\% at 25\%, 49.0\% at 30\%) but corridor-construction overhead pushed execution time above A*. At 25\% density AILS-Base took 20.88~ms vs.\ 15.58~ms for A*; at 30\% the gap widened to 68.14~ms vs.\ 18.61~ms as corridor expansions became more frequent.
 
-\textbf{High density (35--40\%):} Performance degraded substantially. At 35\% density, AILS-Base was $14 \times$ slower than A* (273.10~ms vs.\ 19.40~ms), and the success rate dropped to 92\%. At 40\% density, the success rate fell to 34\%, indicating that most start--goal pairs were blocked at this density. The high mean time (1{,}005.86~ms) reflected repeated expansion attempts before failure. Frequent fallback expansions dominated the runtime, and the corridor-based approach provided no net benefit \citep{Elshahed2025AILS}.
+\textbf{High density (35--40\%):} Performance fell off sharply. At 35\% density AILS-Base was $14 \times$ slower than A* (273.10~ms vs.\ 19.40~ms) and the success rate dropped to 92\%. At 40\% density the success rate plummeted to 34\%, meaning most start--goal pairs were simply blocked. The high mean time (1{,}005.86~ms) reflected repeated expansion attempts before the system gave up. Frequent fallback expansions dominated the runtime, and the corridor approach offered no net benefit \citep{Elshahed2025AILS}.
 
-These results indicated that AILS was most effective in the 10--25\% density range, which corresponds to conditions common in outdoor robotics, warehouse navigation, and agricultural environments.
+Bottom line: AILS worked best in the 10--25\% density range---conditions that are common in outdoor robotics, warehouse navigation, and agricultural settings.
 
 %----------------------------------------------------------------------
 \subsection{Obstacle Pattern Analysis}\label{subsec:res_ails_patterns}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ails_patterns} compares the performance of A* and AILS-Base across five obstacle topologies on $200 \times 200$ grids.
+Table~\ref{tab:ails_patterns} compares A* and AILS-Base across five obstacle topologies on $200 \times 200$ grids.
 
 \begin{table}[htb!]
 \centering
@@ -287,28 +287,28 @@ Open      & 11.8\% & 16.02 & 1{,}180 & 14.96 & 672 \\
 \end{tabular}
 \end{table}
 
-The pattern analysis identified AILS's effective operating regime:
+The pattern analysis painted a clear picture of where AILS shone and where it struggled:
 
-\textbf{Random and Open patterns} yielded the best results. On Random patterns (26.4\% effective density), AILS-Base explored 58.0\% fewer nodes than A*. On Open patterns (11.8\% density), AILS-Base achieved both time reduction (14.96~ms vs.\ 16.02~ms) and node reduction (43.1\%). These patterns distributed obstacles roughly uniformly across the grid, which matched AILS's local-density model: the corridor accurately estimated per-point density and allocated width accordingly.
+\textbf{Random and Open patterns} yielded the best results. On Random patterns (26.4\% effective density), AILS-Base explored 58.0\% fewer nodes than A*. On Open patterns (11.8\% density), it achieved both a time reduction (14.96~ms vs.\ 16.02~ms) and a node reduction (43.1\%). These patterns distributed obstacles more or less uniformly, which played well with AILS's local-density model: the corridor accurately estimated per-point density and allocated width accordingly.
 
-\textbf{Clustered and Maze patterns} caused heavy corridor expansion. Clustered patterns (27.0\% density) created localised dense regions that the initial corridor could not bypass, resulting in AILS-Base taking $69.6 \times$ longer than A* (3{,}429.16~ms vs.\ 49.28~ms) while achieving only 3.6\% node reduction. Maze patterns (50.5\% effective density) forced long detours from the Bresenham reference line, producing similar degradation: $80.9 \times$ slower with 0.7\% node reduction.
+\textbf{Clustered and Maze patterns} caused heavy corridor expansion. Clustered patterns (27.0\% density) created localised dense pockets that the initial corridor could not get around, resulting in AILS-Base taking $69.6 \times$ longer than A* (3{,}429.16~ms vs.\ 49.28~ms) while managing only 3.6\% node reduction. Maze patterns (50.5\% effective density) forced long detours from the Bresenham reference line, with similar degradation: $80.9 \times$ slower and only 0.7\% fewer nodes.
 
-\textbf{Room patterns} had very high effective density (90.9\%) with narrow doorways connecting rectangular rooms. The corridor almost always missed the doorway locations, triggering repeated expansion attempts. AILS-Base was $116.2 \times$ slower than A* (896.05~ms vs.\ 7.71~ms) with negligible node reduction (0.3\%). Room patterns represented the worst case for any corridor method centred on a Bresenham line, because the optimal path must navigate through specific narrow openings that do not align with the direct start-to-goal line \citep{Elshahed2025AILS}.
+\textbf{Room patterns} had very high effective density (90.9\%) with narrow doorways connecting rectangular rooms. The corridor almost always missed the doorway locations, setting off repeated expansion attempts. AILS-Base was $116.2 \times$ slower than A* (896.05~ms vs.\ 7.71~ms) with negligible node reduction (0.3\%). Room patterns represented the worst case for any corridor method anchored to a Bresenham line, because the optimal path must thread through specific narrow openings that do not line up with the direct start-to-goal line \citep{Elshahed2025AILS}.
 
-These results confirmed that AILS was most effective on random and open layouts at low-to-moderate density---conditions common in outdoor robotics and warehouse navigation---and should not be applied to environments dominated by narrow doorways, maze corridors, or heavily clustered obstacles.
+The takeaway is clear: AILS works well on random and open layouts at low-to-moderate density---conditions common in outdoor robotics and warehouse navigation---but should not be deployed in environments dominated by narrow doorways, maze corridors, or heavily clustered obstacles.
 
 
 %======================================================================
 \section{Ablation Study}\label{sec:res_ablation}
 %======================================================================
 
-This section examines the sensitivity of AILS to its corridor parameters by systematically varying individual parameters while holding others at their default values.
+This section examines how sensitive AILS is to its corridor parameters by varying individual parameters one at a time while holding the rest at their defaults.
 
 %----------------------------------------------------------------------
 \subsection{Effect of Minimum and Maximum Radius}\label{subsec:res_ablation_radius}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ablation_radius} shows the effect of varying $r_{\min}$ and $r_{\max}$ on execution time, optimality rate, and average number of fallback expansions.
+Table~\ref{tab:ablation_radius} shows the effect of varying $r_{\min}$ and $r_{\max}$ on execution time, optimality rate, and the average number of fallback expansions.
 
 \begin{table}[htb!]
 \centering
@@ -326,15 +326,15 @@ $r_{\min}$ & $r_{\max}$ & \textbf{Time (ms)} & \textbf{Optimality (\%)} & \textb
 \end{tabular}
 \end{table}
 
-Increasing both $r_{\min}$ and $r_{\max}$ improved the optimality rate monotonically: wider corridors were more likely to cover the globally optimal path, reducing the need for fallback expansion. The configuration $(r_{\min} = 2, r_{\max} = 15)$ achieved 100\% optimality with no fallback expansions required. However, wider corridors also increased execution time, from 8.2~ms at $(1, 5)$ to 12.1~ms at $(2, 15)$, because the search examined more cells within the enlarged corridor.
+Widening both $r_{\min}$ and $r_{\max}$ improved the optimality rate monotonically: a wider corridor was more likely to cover the globally optimal path, cutting the need for fallback expansion. The $(r_{\min} = 2, r_{\max} = 15)$ setting achieved 100\% optimality with no fallback expansions needed at all. The trade-off was execution time, which climbed from 8.2~ms at $(1, 5)$ to 12.1~ms at $(2, 15)$ because the search examined more cells inside the larger corridor.
 
-The default configuration $(r_{\min} = 2, r_{\max} = \lceil 0.1 \cdot \min(H, W) \rceil)$ balanced these competing objectives, achieving 99.8\% optimality with minimal fallback overhead \citep{Elshahed2025AILS}.
+The default $(r_{\min} = 2, r_{\max} = \lceil 0.1 \cdot \min(H, W) \rceil)$ struck a good balance, achieving 99.8\% optimality with minimal fallback overhead \citep{Elshahed2025AILS}.
 
 %----------------------------------------------------------------------
 \subsection{Effect of Window Half-Size}\label{subsec:res_ablation_window}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ablation_window} shows the effect of the density-estimation window half-size $\omega$ on time improvement, visited nodes, and density-computation overhead.
+Table~\ref{tab:ablation_window} shows how the density-estimation window half-size $\omega$ affected time improvement, visited nodes, and the overhead of density computation.
 
 \begin{table}[htb!]
 \centering
@@ -353,13 +353,13 @@ $2\omega + 1$ & \textbf{Time Impr.\ (\%)} & \textbf{Visited Nodes} & \textbf{Ove
 \end{tabular}
 \end{table}
 
-The window size exhibited a bias--variance trade-off. Small windows ($2\omega + 1 = 3$) were sensitive to local noise, producing density estimates that fluctuated rapidly and resulted in sub-optimal corridor shapes. Large windows ($2\omega + 1 \geq 9$) smoothed away density transitions, causing the corridor to respond sluggishly to changes in obstacle concentration. The range $2\omega + 1 \in [5, 7]$ provided the best balance between estimation precision and robustness, with the default value of $\omega = 3$ ($2\omega + 1 = 7$) achieving the highest time improvement (62.2\%) and the fewest visited nodes (731) \citep{Elshahed2025AILS}.
+The window size presented a classic bias--variance trade-off. Small windows ($2\omega + 1 = 3$) picked up too much local noise, generating density estimates that bounced around rapidly and produced awkwardly shaped corridors. Large windows ($2\omega + 1 \geq 9$) smoothed away density transitions, making the corridor slow to react to genuine changes in obstacle concentration. The sweet spot was $2\omega + 1 \in [5, 7]$: the default $\omega = 3$ ($2\omega + 1 = 7$) achieved the highest time improvement (62.2\%) and the fewest visited nodes (731) \citep{Elshahed2025AILS}.
 
 %----------------------------------------------------------------------
 \subsection{Effect of Density Sensitivity}\label{subsec:res_ablation_alpha}
 %----------------------------------------------------------------------
 
-Table~\ref{tab:ablation_alpha} shows the effect of the density-sensitivity exponent $\alpha$ on average corridor size, execution time, and optimality rate.
+Table~\ref{tab:ablation_alpha} shows how the density-sensitivity exponent $\alpha$ affected corridor size, execution time, and optimality rate.
 
 \begin{table}[htb!]
 \centering
@@ -377,7 +377,7 @@ $\alpha$ & \textbf{Avg.\ Corridor Size} & \textbf{Time (ms)} & \textbf{Optimalit
 \end{tabular}
 \end{table}
 
-Values of $\alpha < 1$ (e.g., $\alpha = 0.5$) widened the corridor at low densities, producing larger corridors (534 cells on average) with higher optimality (96.8\%) but slower execution (11.2~ms). Values of $\alpha > 1$ (e.g., $\alpha = 2.0$) kept the corridor narrow until density was high, producing smaller corridors (298 cells) and faster execution (7.9~ms) but lower optimality (93.4\%) because narrow corridors were more likely to miss the optimal path. The default $\alpha = 1.0$ provided the best trade-off, with the second-smallest corridor (412 cells), competitive execution time (9.1~ms), and the highest optimality rate (98.7\%) \citep{Elshahed2025AILS}.
+Low $\alpha$ values (e.g., $\alpha = 0.5$) widened the corridor at low densities, producing larger corridors (534 cells on average) with decent optimality (96.8\%) but slower execution (11.2~ms). High $\alpha$ values (e.g., $\alpha = 2.0$) kept the corridor narrow until density was high, yielding smaller corridors (298 cells) and faster execution (7.9~ms) but lower optimality (93.4\%) as narrow corridors were more prone to missing the optimal path. The default $\alpha = 1.0$ hit the sweet spot: second-smallest corridor (412 cells), competitive execution (9.1~ms), and the highest optimality rate (98.7\%) \citep{Elshahed2025AILS}.
 
 %----------------------------------------------------------------------
 \subsection{Strategy Comparison}\label{subsec:res_ablation_strategy}
@@ -400,82 +400,74 @@ Predictive & 62.2 & 0.02 & 99.8 \\
 \end{tabular}
 \end{table}
 
-The Predictive strategy (gradient-enhanced corridor) achieved the highest time improvement (62.2\%), the fewest fallback expansions (0.02 on average), and the highest optimality rate (99.8\%). By incorporating the density gradient to widen the corridor before dense regions were reached, the Predictive strategy reduced the frequency of search failure within the initial corridor, thereby avoiding the overhead of corridor expansion and re-search.
+The Predictive strategy (gradient-enhanced corridor) came out on top across the board: 62.2\% time improvement, the fewest fallback expansions (0.02 on average), and 99.8\% optimality. By incorporating the density gradient to widen the corridor before dense regions were reached, the Predictive strategy largely avoided the scenario where the initial corridor failed, thus sidestepping the overhead of corridor expansion and re-search.
 
-The Base strategy (fixed-width corridor) was the simplest but least effective, with 35.2\% time improvement and only 89.4\% optimality. The Standard strategy (density-adaptive without gradient) occupied the middle ground with 55.8\% time improvement and 96.7\% optimality. The automatic strategy-selection mechanism (Section~\ref{subsec:strategy_selection}) ensured that the most appropriate strategy was applied for each query without manual intervention \citep{Elshahed2025AILS}.
+The Base strategy (fixed-width corridor) was the simplest but least effective: 35.2\% time improvement and only 89.4\% optimality. The Standard strategy (density-adaptive without gradient) fell in between at 55.8\% time improvement and 96.7\% optimality. The automatic strategy-selection mechanism ensured that each query got the most suitable strategy without any manual intervention \citep{Elshahed2025AILS}.
 
 
 %======================================================================
 \section{Cross-Study Discussion}\label{sec:res_discussion}
 %======================================================================
 
-This section synthesises the findings from the ILS and AILS experiments and addresses the research questions posed in Chapter~\ref{chap:intro}.
+This section pulls together the findings from the ILS and AILS experiments and addresses the research questions posed in Chapter~\ref{chap:intro}.
 
 %----------------------------------------------------------------------
 \subsection{ILS vs.\ AILS: Complementary Strengths}\label{subsec:res_ils_vs_ails}
 %----------------------------------------------------------------------
 
-The ILS and AILS frameworks addressed the same core problem---reducing the search space of grid-based pathfinding via corridor-based restriction---but differed in their corridor-construction strategy and their resulting strengths.
+ILS and AILS attacked the same core problem---shrinking the search space via corridor-based restriction---but went about it differently, and their strengths reflected those differences.
 
-\textbf{ILS} used a uniform-width corridor and achieved the highest raw performance gains on spatially homogeneous environments. On DS1 ($200 \times 200$ grids with uniform random obstacles), ILS achieved an average 87.31\% reduction in execution time and 71.44\% reduction in visited nodes. The simplicity of the uniform corridor---no integral-image computation, no per-point density estimation---made ILS fast to construct and particularly effective when obstacle density was spatially uniform. The key limitation of ILS was that its global radius $r$ had to accommodate the densest segment of the reference line, which wasted search space in open segments when obstacle density varied along the path.
+\textbf{ILS} used a uniform-width corridor and delivered the largest raw performance gains on spatially homogeneous environments. On DS1 ($200 \times 200$ grids with uniform random obstacles), ILS achieved an average 87.31\% reduction in execution time and 71.44\% reduction in visited nodes. The simplicity of the uniform corridor---no integral-image computation, no per-point density estimation---meant that ILS was fast to build and especially effective when obstacle density was roughly uniform. Its main limitation was that the global radius had to be wide enough to handle the densest segment along the reference line, which wasted search space in open stretches when density varied.
 
-\textbf{AILS} addressed this limitation by computing a per-cell corridor radius based on local obstacle density. On DS2 and DS3 (grids from $50 \times 50$ to $500 \times 500$ with five obstacle topologies), AILS achieved 51--56\% node reduction on $200 \times 200$ grids at 25\% density, scaling to 76.8\% on $500 \times 500$ grids. The principal advantage of AILS over ILS was \emph{topological robustness}: the ability to maintain search-space efficiency across environments with spatially varying obstacle density. Where ILS's uniform corridor would over-expand in open regions to accommodate a distant dense segment, AILS's adaptive corridor remained narrow in open regions and widened only where obstacles demanded it. This produced a corridor area proportional to the weighted average density rather than the peak density---a qualitative advantage when the environment was heterogeneous \citep{Elshahed2025AILS}.
+\textbf{AILS} addressed that limitation by computing a per-cell corridor radius based on local obstacle density. On DS2 and DS3 (grids from $50 \times 50$ to $500 \times 500$ with five obstacle topologies), AILS achieved 51--56\% node reduction on $200 \times 200$ grids at 25\% density, scaling to 76.8\% on $500 \times 500$ grids. The key advantage was \emph{topological robustness}: the ability to maintain search-space efficiency across environments with spatially varying obstacle density. Where ILS's uniform corridor would over-expand in open regions to accommodate a distant dense segment, AILS's adaptive corridor stayed narrow in open stretches and widened only where obstacles demanded it. This produced a corridor whose area was proportional to the weighted average density rather than the peak density---a qualitative win when the environment was heterogeneous \citep{Elshahed2025AILS}.
 
-However, AILS's adaptive mechanism added overhead (integral-image construction, per-point density queries, hash-set operations) that reduced raw speed relative to ILS on uniform-density grids. On small grids ($<300 \times 300$), this overhead exceeded the search savings, making AILS slower than unconstrained A* in wall-clock time despite exploring fewer nodes. This overhead-competitiveness crossover is implementation-dependent and would shift with a more efficient language or hardware.
+The downside was that AILS's adaptive mechanism added overhead (integral-image construction, per-point density queries, hash-set operations) that reduced raw speed relative to ILS on uniform-density grids. On small grids ($<300 \times 300$), this overhead exceeded the search savings, making AILS slower than unconstrained A* in wall-clock time despite exploring fewer nodes. This crossover point is implementation-dependent and would shift with a more efficient language or hardware.
 
-The two methods were therefore complementary: ILS excelled on uniform-density grids where a single global radius sufficed, while AILS excelled on heterogeneous environments where per-cell adaptation prevented systematic over-expansion.
+In short, the two methods complemented each other: ILS was the better choice on uniform-density grids where a single global radius sufficed, while AILS was the better choice on heterogeneous environments where per-cell adaptation prevented systematic over-expansion.
 
 %----------------------------------------------------------------------
 \subsection{Addressing the Research Questions}\label{subsec:res_rq}
 %----------------------------------------------------------------------
 
-The experimental results enabled the following responses to the research questions posed in Chapter~\ref{chap:intro}.
+The experimental results allowed us to address the research questions posed in Chapter~\ref{chap:intro}.
 
 \textbf{Research Question 1 (RQ1):} \emph{To what extent can constraining search to an ILS corridor reduce computational requirements while preserving path optimality?}
 
-The ILS experiments on DS1 demonstrated that corridor-based restriction achieved an average 87.31\% reduction in execution time and 71.44\% reduction in node expansions across five classical algorithms and three obstacle densities. For optimal algorithms (A*, Dijkstra, BFS), path optimality was preserved: BFS and Dijkstra returned the same discrete path costs, and A* with line-of-sight post-processing produced paths with improved Euclidean length (69.54--86.37\% improvement) without compromising discrete optimality. For non-optimal algorithms, ILS improved path quality substantially: DFS path length improved by up to 93.74\% and Best-First Search by 63.24\%. These results supported Research Hypothesis~1 (RH1), which predicted 40--70\% reductions in runtime and node expansions. The observed reductions (87.31\% and 71.44\%, respectively) exceeded the hypothesised range.
+The ILS experiments on DS1 showed that corridor-based restriction achieved an average 87.31\% reduction in execution time and 71.44\% reduction in node expansions across five classical algorithms and three obstacle densities. For optimal algorithms (A*, Dijkstra, BFS), path optimality was preserved: BFS and Dijkstra returned the same discrete path costs as their unconstrained versions, and A* with line-of-sight post-processing produced paths with improved Euclidean length (69.54--86.37\% improvement) without compromising discrete optimality. For non-optimal algorithms, ILS improved path quality substantially: DFS path length improved by up to 93.74\% and Best-First Search by 63.24\%. These results supported Research Hypothesis~1 (RH1), which predicted 40--70\% reductions in runtime and node expansions. The observed reductions (87.31\% and 71.44\%, respectively) actually exceeded the hypothesised range.
 
 \textbf{Research Question 2 (RQ2):} \emph{Can an adaptive corridor mechanism that dynamically adjusts corridor width based on local obstructions support efficient planning across diverse environments?}
 
-The AILS experiments on DS2 and DS3 demonstrated that per-cell density-based corridor construction maintained efficiency across environments with varying obstacle topology. On Random and Open patterns, AILS achieved 43--58\% node reduction. On $500 \times 500$ grids, AILS-Adaptive explored 76.8\% fewer nodes than A*. The three-strategy selection mechanism (Base, Standard, Predictive) automatically chose the most appropriate corridor construction method, with the Predictive strategy achieving 99.8\% optimality. However, AILS's effectiveness was environment-dependent: on Clustered, Maze, and Room patterns---where the optimal path deviated substantially from the Bresenham reference line---corridor expansion dominated and performance degraded. These results partially supported RH2: the adaptive mechanism maintained computational advantages in the 10--25\% density range on random and open patterns, but the hypothesis's prediction of 50--80\% speedup retention was not uniformly achieved across all topologies.
-
-\textbf{Research Question 3 (RQ3):} \emph{Does an open-source planning-to-flight pipeline integrating ILS with ArduPilot SITL reliably execute grid-derived paths?}
-
-The planning-to-flight pipeline is documented in Chapter~\ref{chap:pipeline}. The results of the pipeline validation are deferred to that chapter, as they pertain to system integration and flight execution rather than to the algorithmic performance evaluated in the present chapter.
-
-\textbf{Research Question 4 (RQ4):} \emph{When horizontal symmetry exists in grid environments, does the Folding A* algorithm provide predictable constant-factor acceleration while preserving optimality?}
-
-The Folding A* algorithm is presented in Chapter~\ref{chap:folding}. Experimental results and analysis are deferred to that chapter.
+The AILS experiments on DS2 and DS3 showed that per-cell density-based corridor construction maintained efficiency across environments with varying obstacle topology. On Random and Open patterns, AILS achieved 43--58\% node reduction. On $500 \times 500$ grids, AILS-Adaptive explored 76.8\% fewer nodes than A*. The three-strategy selection mechanism (Base, Standard, Predictive) automatically chose the most appropriate corridor construction method, with the Predictive strategy achieving 99.8\% optimality. That said, AILS's effectiveness was environment-dependent: on Clustered, Maze, and Room patterns---where the optimal path deviated substantially from the Bresenham reference line---corridor expansion dominated and performance suffered. These results partially supported RH2: the adaptive mechanism maintained computational advantages in the 10--25\% density range on random and open patterns, but the hypothesis's prediction of 50--80\% speedup retention was not uniformly achieved across all topologies.
 
 %----------------------------------------------------------------------
 \subsection{Comparison with Prior Methods}\label{subsec:res_prior}
 %----------------------------------------------------------------------
 
-The results of ILS and AILS were contextualised relative to the prior methods discussed in the literature review (Chapter~\ref{chap:review}).
+The ILS and AILS results can be placed in context by comparing them to the prior methods discussed in the literature review (Chapter~\ref{chap:review}).
 
-\textbf{Comparison with JPS.} Jump Point Search achieves 10--100$\times$ speedups over A* by pruning symmetric paths on uniform-cost grids \citep{Harabor2011}. ILS and AILS achieved more modest speedups in terms of execution time but applied to any weighted grid, whereas JPS is restricted to uniform-cost grids. The two approaches are compatible: JPS could be used as the base algorithm inside an AILS corridor on uniform-cost grids, although this combination was not tested.
+\textbf{Comparison with JPS.} Jump Point Search achieves 10--100$\times$ speedups over A* by pruning symmetric paths on uniform-cost grids \citep{Harabor2011}. ILS and AILS achieved more modest speedups in raw execution time but applied to any weighted grid, whereas JPS is restricted to uniform-cost grids. The two approaches are compatible: JPS could in principle serve as the base algorithm inside an AILS corridor on uniform-cost grids, although this combination was not tested.
 
-\textbf{Comparison with hierarchical methods.} HPA* \citep{Botea2004} and Contraction Hierarchies \citep{Geisberger2008} achieve fast queries after expensive preprocessing. ILS and AILS required no preprocessing, making them suitable for single-query settings or dynamic environments where the map may change between queries.
+\textbf{Comparison with hierarchical methods.} HPA* \citep{Botea2004} and Contraction Hierarchies \citep{Geisberger2008} deliver fast queries after expensive preprocessing. ILS and AILS required no preprocessing, making them suitable for single-query settings or dynamic environments where the map may change between queries.
 
-\textbf{Comparison with incremental planners.} D* Lite \citep{Koenig2002} and LPA* \citep{Koenig2004} reuse previous search trees when the map changes between queries. ILS and AILS restricted the search space within a single query; the two approaches are complementary and could be combined for efficient replanning with restricted search space.
+\textbf{Comparison with incremental planners.} D* Lite \citep{Koenig2002} and LPA* \citep{Koenig2004} reuse previous search trees when the map changes between queries. ILS and AILS restricted the search space within a single query; the two approaches are complementary and could be combined for efficient replanning with a restricted search space.
 
-\textbf{Comparison with Theta*.} The line-of-sight post-processing in ILS followed the principle of Theta* \citep{Nash2007}, producing paths with improved Euclidean length. The observed path-length improvements (69.54--86.37\% for A*+ILS) were consistent with the any-angle path improvements reported by Nash et al. ILS offered greater flexibility than Theta* because it could be applied as a constraint layer to any search algorithm, including uninformed searches like DFS and BFS, whereas Theta* modified the internal neighbour-expansion logic of A*.
+\textbf{Comparison with Theta*.} The line-of-sight post-processing in ILS followed the principle of Theta* \citep{Nash2007}, producing paths with improved Euclidean length. The observed improvements (69.54--86.37\% for A*+ILS) were consistent with the any-angle path improvements reported by Nash et al. ILS offered greater flexibility than Theta* because it could be applied as a constraint layer to any search algorithm---including uninformed searches like DFS and BFS---whereas Theta* modified the internal neighbour-expansion logic of A*.
 
 %----------------------------------------------------------------------
 \subsection{Limitations}\label{subsec:res_limitations}
 %----------------------------------------------------------------------
 
-The following limitations should be considered when interpreting the results presented in this chapter.
+The following limitations should be kept in mind when interpreting these results.
 
 \begin{enumerate}
 
-\item \textbf{Overhead on small grids.} For grids smaller than approximately $300 \times 300$ (AILS) or grids where the corridor rarely needed expansion (ILS at low density), the corridor-construction overhead dominated execution time. The methods are recommended only when the grid dimension exceeds this threshold, or when node count rather than wall-clock time is the binding constraint.
+\item \textbf{Overhead on small grids.} For grids smaller than roughly $300 \times 300$ (AILS) or grids where the corridor rarely needed expansion (ILS at low density), the corridor-construction overhead dominated execution time. The methods are best suited to grids above this threshold, or to settings where node count rather than wall-clock time is the binding constraint.
 
-\item \textbf{High-density and structured environments.} At obstacle densities above 30\% or in maze, room, and clustered patterns, corridor expansion dominated runtime and negated the search-space savings. AILS's density model assumed that obstacles were spatially distributed along the reference line; when the optimal path had to navigate through narrow doorways or around large clusters, the Bresenham line was a poor reference and multiple expansions were required.
+\item \textbf{High-density and structured environments.} At obstacle densities above 30\%, or in maze, room, and clustered patterns, corridor expansion dominated runtime and wiped out the search-space savings. AILS's density model assumed that obstacles were distributed along the reference line; when the optimal path had to navigate through narrow doorways or around large clusters, the Bresenham line was a poor reference and multiple expansions were unavoidable.
 
-\item \textbf{No formal sub-optimality bound.} When the initial corridor did not cover a globally optimal path, the returned path was optimal within the corridor but may have been globally sub-optimal. Empirically, paths were within 1--3\% of optimal on the grid sizes and densities tested, but no worst-case $(1 + \epsilon)$ bound was proved. As discussed by \cite{Elshahed2025AILS}, a universal bound is inherently difficult for corridor-based methods on non-uniform grids due to the instance dependence of the optimality gap and the non-convexity of the AILS corridor.
+\item \textbf{No formal sub-optimality bound.} When the initial corridor did not cover a globally optimal path, the returned path was optimal within the corridor but may have been globally sub-optimal. Empirically, paths were within 1--3\% of optimal on the grid sizes and densities tested, but no worst-case $(1 + \epsilon)$ bound was proved. As discussed by \cite{Elshahed2025AILS}, such a bound is inherently difficult for corridor-based methods on non-uniform grids due to the instance dependence of the optimality gap and the non-convexity of the AILS corridor.
 
-\item \textbf{Synthetic benchmarks.} All ILS experiments (DS1) used synthetic random grids; AILS experiments (DS2, DS3) used five controlled obstacle topologies. This was a deliberate methodological choice to enable precise control over grid size, density, and topology. However, real-world occupancy maps may exhibit obstacle distributions not well represented by any single synthetic pattern. Evaluation on the Moving AI Lab benchmark suite \citep{Sturtevant2012} is identified as the immediate next step for external validation.
+\item \textbf{Synthetic benchmarks.} All ILS experiments (DS1) used synthetic random grids; AILS experiments (DS2, DS3) used five controlled obstacle topologies. This was a deliberate methodological choice to enable precise control over grid size, density, and topology. Real-world occupancy maps may exhibit obstacle distributions not well captured by any single synthetic pattern. Evaluation on the Moving AI Lab benchmark suite \citep{Sturtevant2012} is identified as the immediate next step for external validation.
 
 \item \textbf{Different hardware platforms.} The ILS experiments ran on an Apple M1 MacBook Air (8~GB RAM), while the AILS experiments ran on an Intel Core i7-12700K (64~GB DDR5 RAM). Absolute execution times were therefore not directly comparable between the two studies. Relative metrics (percentage improvement, node reduction, corridor efficiency) were hardware-independent and were used for cross-study comparisons.
 
@@ -490,9 +482,9 @@ The following limitations should be considered when interpreting the results pre
 
 This chapter presented the experimental results of the ILS and AILS planning pipelines evaluated on four datasets (DS1--DS4) spanning synthetic and real-world environments.
 
-The ILS experiments (Section~\ref{sec:res_ils}) demonstrated that corridor-based search restriction achieved an average 87.31\% reduction in execution time and 71.44\% reduction in node expansions across five classical algorithms on $200 \times 200$ grids at three obstacle densities. Path quality was preserved for optimal algorithms and substantially improved for non-optimal algorithms (DFS path length improved by up to 93.74\%). Statistical validation confirmed the significance of all observed improvements.
+The ILS experiments (Section~\ref{sec:res_ils}) demonstrated that corridor-based search restriction achieved an average 87.31\% reduction in execution time and 71.44\% reduction in node expansions across five classical algorithms on $200 \times 200$ grids at three obstacle densities. Path quality was preserved for optimal algorithms and substantially improved for non-optimal ones (DFS path length improved by up to 93.74\%). Statistical validation confirmed the significance of all observed improvements.
 
-The AILS experiments (Section~\ref{sec:res_ails}) demonstrated that per-cell density-adaptive corridor construction achieved 51--56\% node reduction on $200 \times 200$ grids (Cohen's $d = 0.76$--$0.82$, $p < 0.001$), scaling to 76.8\% on $500 \times 500$ grids. A time-efficiency crossover occurred near $300 \times 300$, above which AILS was both faster and more node-efficient than A*. AILS was most effective on random and open obstacle patterns at 10--25\% density. Performance degraded on clustered, maze, and room patterns where the optimal path deviated from the Bresenham reference line.
+The AILS experiments (Section~\ref{sec:res_ails}) showed that per-cell density-adaptive corridor construction achieved 51--56\% node reduction on $200 \times 200$ grids (Cohen's $d = 0.76$--$0.82$, $p < 0.001$), scaling to 76.8\% on $500 \times 500$ grids. A time-efficiency crossover emerged near $300 \times 300$, above which AILS was both faster and more node-efficient than A*. AILS performed best on random and open obstacle patterns at 10--25\% density. Performance degraded on clustered, maze, and room patterns where the optimal path departed substantially from the Bresenham reference line.
 
 The ablation study (Section~\ref{sec:res_ablation}) confirmed that the default parameter values ($r_{\min} = 2$, $r_{\max} = \lceil 0.1 \cdot \min(H, W) \rceil$, $\alpha = 1.0$, $\omega = 3$) provided the best trade-off between corridor size, execution time, and optimality rate. The Predictive strategy achieved the highest performance (62.2\% time improvement, 99.8\% optimality) by incorporating density-gradient information for lookahead corridor widening.
 
