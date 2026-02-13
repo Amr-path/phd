@@ -1,17 +1,17 @@
 \chapter{METHODOLOGY}\label{chap:methodology}
 
-This chapter presents the research methodology adopted to investigate corridor-based pathfinding on grid maps. The chapter is organised as follows. Section~\ref{sec:meth_overview} provides an overview of the proposed research framework and its constituent pipelines. Section~\ref{sec:meth_data} describes the datasets and the preprocessing pipeline used to convert raw environments into binary grid representations. Section~\ref{sec:meth_components} formalises the fundamental algorithmic components shared across all pipelines. Section~\ref{sec:meth_adaptive} details the adaptive corridor construction and strategy-selection procedure central to the Adaptive Incremental Line Search (AILS). Section~\ref{sec:meth_ils_pipeline} presents the ILS-enhanced planning pipeline. Section~\ref{sec:meth_baseline_pipeline} describes the baseline planner pipeline used for comparative evaluation. Section~\ref{sec:meth_ails_pipeline} presents the Adaptive ILS planning pipeline. Section~\ref{sec:meth_metrics} defines the evaluation metrics and experimental protocol. Section~\ref{sec:meth_summary} summarises the chapter and previews the implementation described in Chapter~\ref{chap:pipeline}.
+This chapter presents the research methodology adopted to investigate corridor-based pathfinding on grid maps. The chapter is organised as follows. Section~\ref{sec:meth_overview} provides an overview of the proposed research framework and its constituent pipelines. Section~\ref{sec:meth_data} describes the datasets and the preprocessing pipeline used to convert raw environments into binary grid representations. Section~\ref{sec:meth_components} formalises the fundamental algorithmic components shared across all pipelines. Section~\ref{sec:meth_adaptive} details the adaptive corridor construction and strategy-selection procedure central to the Adaptive Incremental Line Search (AILS). Section~\ref{sec:meth_ils_pipeline} presents the ILS-enhanced planning pipeline. Section~\ref{sec:meth_baseline_pipeline} describes the baseline planner pipeline used for comparative evaluation. Section~\ref{sec:meth_ails_pipeline} presents the Adaptive ILS planning pipeline. Section~\ref{sec:meth_metrics} defines the evaluation metrics and experimental protocol. Section~\ref{sec:meth_summary} summarises the chapter.
 
 
 %======================================================================
 \section{Overview of Proposed Research Framework}\label{sec:meth_overview}
 %======================================================================
 
-The research framework comprised four methodological pipelines, each designed to address a specific research objective. Together, the pipelines formed a progressive investigation: from establishing classical baselines, through corridor-constrained search, to adaptive corridor construction, and finally to planning-to-flight integration on an autonomous drone platform. Figure~\ref{fig:framework_overview} illustrates the overall framework and the relationships among the four pipelines.
+The research framework comprised three methodological pipelines, each designed to address a specific aspect of the investigation. Together, the pipelines formed a progressive study: from establishing classical baselines, through corridor-constrained search, to adaptive corridor construction. Figure~\ref{fig:framework_overview} illustrates the overall framework and the relationships among the three pipelines.
 
 \begin{figure}[htb!]
 \centering
-\resizebox{0.95\textwidth}{!}{%
+\resizebox{0.85\textwidth}{!}{%
 \begin{tikzpicture}[
     >=Stealth,
     node distance=1.0cm and 0.6cm,
@@ -49,70 +49,63 @@ The research framework comprised four methodological pipelines, each designed to
 % Label for output
 \node[below=0.15cm of preproc.south, font=\scriptsize\itshape] (prepout) {Binary Occupancy Grid $G = (V, E, w)$ + Start/Goal};
 
-% --- Four Pipelines ---
-\node[pipebox=red!8, below=1.4cm of preproc.south west, xshift=0.2cm] (p1) {};
+% --- Three Pipelines ---
+\node[pipebox=red!8, below=1.4cm of preproc.south west, xshift=1.5cm] (p1) {};
 \node[pipetitle, anchor=north] at ([yshift=-0.15cm]p1.north) {Pipeline 1};
 \node[pipedesc, anchor=north] at ([yshift=-0.55cm]p1.north) {Baseline Planner\\[2pt]\scriptsize Full-grid search\\(A*, Dijkstra, BFS,\\DFS, Best-First)\\[2pt]\scriptsize No corridor};
 
-\node[pipebox=cyan!8, right=0.5cm of p1] (p2) {};
+\node[pipebox=cyan!8, right=0.7cm of p1] (p2) {};
 \node[pipetitle, anchor=north] at ([yshift=-0.15cm]p2.north) {Pipeline 2};
 \node[pipedesc, anchor=north] at ([yshift=-0.55cm]p2.north) {ILS-Enhanced\\[2pt]\scriptsize Uniform-width\\corridor + incremental\\expansion\\[2pt]\scriptsize Fixed $w_0$};
 
-\node[pipebox=violet!8, right=0.5cm of p2] (p3) {};
+\node[pipebox=violet!8, right=0.7cm of p2] (p3) {};
 \node[pipetitle, anchor=north] at ([yshift=-0.15cm]p3.north) {Pipeline 3};
 \node[pipedesc, anchor=north] at ([yshift=-0.55cm]p3.north) {Adaptive ILS\\[2pt]\scriptsize Density-adaptive\\corridor via integral\\images\\[2pt]\scriptsize Variable $r(p)$};
 
-\node[pipebox=yellow!12, right=0.5cm of p3] (p4) {};
-\node[pipetitle, anchor=north] at ([yshift=-0.15cm]p4.north) {Pipeline 4};
-\node[pipedesc, anchor=north] at ([yshift=-0.55cm]p4.north) {Planning-to-Flight\\[2pt]\scriptsize Drone deployment\\via DroneKit /\\ROS--MAVROS\\[2pt]\scriptsize ArduPilot};
-
 % Arrows from preprocessing to pipelines
-\foreach \p in {p1, p2, p3, p4}{
+\foreach \p in {p1, p2, p3}{
     \draw[arrow] (preproc.south -| \p.north) -- (\p.north);
 }
 
 % --- Evaluation Metrics ---
-\node[metricbox, below=0.9cm of $(p2.south)!0.5!(p3.south)$] (metrics) {Evaluation Metrics};
+\node[metricbox, below=0.9cm of p2.south] (metrics) {Evaluation Metrics};
 \node[below=0.1cm of metrics.south, font=\scriptsize\itshape, align=center] (metdesc) {Execution Time \,\textbar\, Visited Nodes \,\textbar\, Path Length \,\textbar\, Optimality Rate \,\textbar\, Corridor Efficiency};
 
 % Arrows from pipelines to metrics
-\foreach \p in {p1, p2, p3, p4}{
+\foreach \p in {p1, p2, p3}{
     \draw[arrow] (\p.south) -- (metrics.north -| \p.south);
 }
 
 % --- Progressive arrows between pipelines ---
 \draw[darrow, blue!60] ([yshift=-0.15cm]p1.east) -- ([yshift=-0.15cm]p2.west) node[midway, above, font=\tiny\itshape] {+corridor};
 \draw[darrow, blue!60] ([yshift=-0.15cm]p2.east) -- ([yshift=-0.15cm]p3.west) node[midway, above, font=\tiny\itshape] {+adaptive};
-\draw[darrow, blue!60] ([yshift=-0.15cm]p3.east) -- ([yshift=-0.15cm]p4.west) node[midway, above, font=\tiny\itshape] {+flight};
 
 \end{tikzpicture}%
 }
-\caption{Overview of the proposed research framework. The four pipelines share common grid representations and evaluation metrics but differ in their search-space restriction strategy.}
+\caption{Overview of the proposed research framework. The three pipelines share common grid representations and evaluation metrics but differ in their search-space restriction strategy.}
 \label{fig:framework_overview}
 \end{figure}
 
-The four pipelines were defined as follows:
+The three pipelines were defined as follows:
 
 \begin{enumerate}[label=\textbf{Pipeline~\arabic*:}, leftmargin=3.5cm]
 
-\item \textbf{Baseline Planner Pipeline.} This pipeline executed classical pathfinding algorithms---A*, Dijkstra's algorithm, Breadth-First Search (BFS), Depth-First Search (DFS), and Greedy Best-First Search---on the full grid without any search-space restriction. The purpose was to establish performance baselines against which corridor-based methods were compared. The pipeline is detailed in Section~\ref{sec:meth_baseline_pipeline}.
+\item \textbf{Baseline Planner Pipeline.} This pipeline executed classical pathfinding algorithms---A*, Dijkstra's algorithm, Breadth-First Search (BFS), Depth-First Search (DFS), and Greedy Best-First Search---on the full grid without any search-space restriction. Its purpose was to establish performance baselines against which the corridor-based methods could be compared. The pipeline is detailed in Section~\ref{sec:meth_baseline_pipeline}.
 
 \item \textbf{ILS-Enhanced Planning Pipeline.} This pipeline integrated the Incremental Line Search (ILS) optimisation with each of the classical algorithms listed above. ILS constrained the search to a corridor centred on a Bresenham reference line connecting start and goal, and expanded the corridor incrementally when no path was found within the current band. The pipeline is detailed in Section~\ref{sec:meth_ils_pipeline}.
 
 \item \textbf{Adaptive ILS Planning Pipeline.} This pipeline extended the ILS approach by introducing per-point density estimation via integral images and a variable-width corridor whose radius at each reference-line cell was a closed-form function of the local obstacle density. Three corridor strategies---Base, Standard, and Predictive---were provided and selected automatically. The pipeline is detailed in Section~\ref{sec:meth_ails_pipeline}.
 
-\item \textbf{Planning-to-Flight Pipeline.} This pipeline deployed the pathfinding algorithms on an autonomous drone platform via DroneKit and ROS/MAVROS integration with ArduPilot. The implementation details and flight procedures are deferred to Chapter~\ref{chap:pipeline}, as they pertain to system integration rather than algorithmic methodology.
-
 \end{enumerate}
 
-All four pipelines shared the same grid representation, preprocessing procedure, and evaluation metrics, thereby ensuring that performance differences were attributable solely to the search strategy employed.
+All three pipelines shared the same grid representation, preprocessing procedure, and evaluation metrics, thereby ensuring that performance differences were attributable solely to the search strategy employed.
 
 
 %======================================================================
 \section{Data Description and Preprocessing Pipeline}\label{sec:meth_data}
 %======================================================================
 
-This section describes the four datasets used throughout the experimental evaluation and the preprocessing pipeline applied to convert raw environments into binary occupancy grids.
+This section describes the four datasets used throughout the experimental evaluation and the preprocessing steps applied to turn raw environments into binary occupancy grids.
 
 %----------------------------------------------------------------------
 \subsection{Dataset Descriptions}\label{subsec:datasets}
@@ -161,7 +154,7 @@ All grid maps, whether synthetically generated or derived from imagery, underwen
 
 \item \textbf{Binary Thresholding.} Each pixel was classified as either traversable ($\text{value} \geq 128$) or obstacle ($\text{value} < 128$) using a fixed threshold of 128. This threshold was applied uniformly across all image-derived grids.
 
-\item \textbf{Grid Construction.} The binary image was mapped to an occupancy grid $G = (V, E, w)$, where each pixel corresponded to one vertex $v \in V$, and edges connected each vertex to its valid neighbours under the chosen connectivity model (8-connected for DS1--DS3; 4-connected for the drone implementation described in Chapter~\ref{chap:pipeline}).
+\item \textbf{Grid Construction.} The binary image was mapped to an occupancy grid $G = (V, E, w)$, where each pixel corresponded to one vertex $v \in V$, and edges connected each vertex to its valid neighbours under the chosen connectivity model (8-connected for DS1--DS3; 4-connected where applicable).
 
 \item \textbf{Obstacle Density Verification.} For synthetic grids (DS1--DS3), the actual obstacle density of each generated map was verified against the target density. Maps whose actual density deviated by more than 1\% from the target were regenerated.
 
@@ -258,7 +251,7 @@ Figure~\ref{fig:preprocessing} illustrates the preprocessing pipeline.
 \section{Fundamental Components}\label{sec:meth_components}
 %======================================================================
 
-This section formalises the algorithmic building blocks shared by all three planning pipelines. Each component is defined independently so that it can be referenced by subsequent sections without repetition.
+This section formalises the algorithmic building blocks that all three planning pipelines share. Each component is defined independently so that later sections can reference it without repetition.
 
 %----------------------------------------------------------------------
 \subsection{Grid Representation and State Space}\label{subsec:grid_state}
@@ -298,12 +291,12 @@ w(v, v') =
 \end{cases}
 \end{equation}
 
-\textbf{4-Connected Grid (Drone Implementation).} For the drone-based planning pipeline (Chapter~\ref{chap:pipeline}), each non-boundary vertex had up to four cardinal neighbours, and all edge costs were uniform:
+\textbf{4-Connected Grid.} In a 4-connected configuration, each non-boundary vertex had up to four cardinal neighbours, and all edge costs were uniform:
 \begin{equation}\label{eq:cost_4conn}
 w(v, v') = 1 \quad \text{for all cardinal moves}.
 \end{equation}
 
-The 4-connected model was adopted for the drone implementation to simplify waypoint generation, as cardinal-only movement translated directly to axis-aligned flight segments.
+The 4-connected model simplifies waypoint generation, as cardinal-only movement translates directly to axis-aligned segments.
 
 %----------------------------------------------------------------------
 \subsection{Heuristic Functions}\label{subsec:heuristics}
@@ -440,7 +433,7 @@ DFS and Greedy Best-First Search did not receive line-of-sight post-processing, 
 \section{Adaptive Corridor and Strategy Selection Procedure}\label{sec:meth_adaptive}
 %======================================================================
 
-This section describes the strategy-selection mechanism that determined which corridor construction method was applied for a given query, as well as the fallback expansion procedure that ensured completeness.
+This section describes how the system chose which corridor construction method to apply for a given query, along with the fallback expansion procedure that ensured completeness.
 
 %----------------------------------------------------------------------
 \subsection{Multi-Strategy Selection}\label{subsec:strategy_selection}
@@ -614,7 +607,7 @@ This section describes the ILS-enhanced planning pipeline (Pipeline~2), which in
 \subsection{Objective}\label{subsec:ils_objective}
 %----------------------------------------------------------------------
 
-The objective of the ILS pipeline was to evaluate the effect of corridor-based search-space restriction on the performance of classical pathfinding algorithms. The pipeline constrained each algorithm's neighbour expansion to the ILS corridor and measured the resulting changes in execution time, visited nodes, and path length relative to the unconstrained baselines.
+The goal of the ILS pipeline was to measure what happens to classical pathfinding performance when the search space is restricted to a corridor. Each algorithm's neighbour expansion was confined to the ILS corridor, and the resulting changes in execution time, visited nodes, and path length were measured against the unconstrained baselines.
 
 %----------------------------------------------------------------------
 \subsection{Algorithm-Specific Adaptations}\label{subsec:ils_adaptations}
@@ -715,7 +708,7 @@ This section describes the baseline planner pipeline (Pipeline~1), which provide
 \subsection{Objective}\label{subsec:baseline_objective}
 %----------------------------------------------------------------------
 
-The objective of the baseline pipeline was to execute each classical pathfinding algorithm on the full grid without any search-space restriction, thereby establishing the unconstrained performance envelope for each algorithm across all datasets.
+The baseline pipeline ran each classical pathfinding algorithm on the full grid without any search-space restriction, thereby establishing the unconstrained performance envelope for every algorithm across all datasets.
 
 %----------------------------------------------------------------------
 \subsection{Specification}\label{subsec:baseline_spec}
@@ -769,7 +762,7 @@ This section describes the Adaptive ILS planning pipeline (Pipeline~3), which ex
 \subsection{Objective}\label{subsec:ails_objective}
 %----------------------------------------------------------------------
 
-The objective of the AILS pipeline was to evaluate whether a variable-width corridor, whose radius at each reference-line cell was adapted to the local obstacle density, could provide robust search-space reduction across diverse obstacle topologies---including environments where a uniform-width corridor would either over-expand in open regions or under-expand near obstacles.
+The AILS pipeline set out to determine whether a variable-width corridor---one whose radius at each reference-line cell adapts to the local obstacle density---could deliver robust search-space reduction across diverse obstacle topologies, including environments where a uniform-width corridor would either waste space in open regions or prove too narrow near obstacles.
 
 %----------------------------------------------------------------------
 \subsection{Architecture}\label{subsec:ails_architecture}
@@ -912,7 +905,7 @@ $|\nabla \sigma|$ threshold & 0.1 & Gradient threshold for strategy selection (B
 \end{tabular}
 \end{table}
 
-These defaults were adopted from the AILS study \citep{Elshahed2025AILS}. In the AILS experiments, parameter sensitivity was assessed by systematically varying $r_{\min}$, $r_{\max}$, $\alpha$, and $\omega$ while holding other parameters at their defaults (see Chapter~\ref{chap:results}).
+These defaults were adopted from the AILS study \citep{Elshahed2025AILS}. In the experiments, parameter sensitivity was assessed by systematically varying $r_{\min}$, $r_{\max}$, $\alpha$, and $\omega$ while holding other parameters at their defaults; results of this ablation study are presented in the next chapter.
 
 
 %======================================================================
@@ -957,7 +950,7 @@ The following metrics were employed to assess algorithm performance:
 \subsection{Experimental Protocol}\label{subsec:protocol}
 %----------------------------------------------------------------------
 
-The experimental protocol was designed to ensure reproducibility and statistical rigour:
+The experimental protocol was designed with reproducibility and statistical rigour in mind:
 
 \textbf{Execution.} Each algorithm was executed on identical grids in both standard and corridor-based configurations. For DS1, all 2{,}000 maps per density were evaluated; for DS2--DS3, 100 random start--goal pairs per configuration were used.
 
@@ -996,8 +989,6 @@ Two hardware configurations were used across the studies:
 \end{tabular}
 \end{table}
 
-The drone-based experiments (Pipeline~4) used an identical software environment to the AILS study (Python~3.10 on Ubuntu~22.04~LTS) running on the same Intel Core i7-12700K workstation, with ArduPilot SITL executing locally. The hardware configuration for the drone flight controller and communication interface is described in Chapter~\ref{chap:pipeline}.
-
 The use of different hardware platforms across the two studies meant that absolute execution times were not directly comparable between the ILS and AILS experiments. Relative metrics (percentage improvement, node reduction, corridor efficiency) were hardware-independent and were used for cross-study comparisons.
 
 
@@ -1005,7 +996,7 @@ The use of different hardware platforms across the two studies meant that absolu
 \section{Summary}\label{sec:meth_summary}
 %======================================================================
 
-This chapter presented the methodology adopted to investigate corridor-based pathfinding on grid maps. The research framework comprised four pipelines---Baseline, ILS, AILS, and Planning-to-Flight---sharing a common grid representation, preprocessing procedure, and evaluation protocol.
+This chapter presented the methodology adopted to investigate corridor-based pathfinding on grid maps. The research framework comprised three pipelines---Baseline, ILS, and AILS---sharing a common grid representation, preprocessing procedure, and evaluation protocol.
 
 Section~\ref{sec:meth_data} described four datasets (DS1--DS4) spanning synthetic and real-world environments, with grid sizes from $50 \times 50$ to $500 \times 500$, obstacle densities from 10\% to 40\%, and five obstacle topologies. A nine-step preprocessing pipeline converted raw environments into binary occupancy grids suitable for all planning pipelines.
 
@@ -1016,5 +1007,3 @@ Section~\ref{sec:meth_adaptive} detailed the AILS multi-strategy selection mecha
 Sections~\ref{sec:meth_ils_pipeline}--\ref{sec:meth_ails_pipeline} presented the three algorithmic pipelines: the ILS-enhanced pipeline with five algorithm-specific adaptations and incremental corridor expansion; the baseline pipeline providing unconstrained performance references; and the AILS pipeline with four-stage architecture, constrained search, and local fallback expansion.
 
 Section~\ref{sec:meth_metrics} defined eight evaluation metrics and an experimental protocol incorporating paired $t$-tests, Cohen's $d$ effect sizes, Shapiro--Wilk normality checks, and ANOVA with Tukey HSD correction.
-
-Chapter~\ref{chap:pipeline} describes the software implementation of the framework, including the Python codebase, the drone integration via DroneKit and ROS/MAVROS, and the experimental execution environment.
